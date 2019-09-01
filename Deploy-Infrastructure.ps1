@@ -70,11 +70,10 @@ $provisionReqs = @(
     @{
         Name = "Terraform Apply"
         Describe = "Apply Terraform plan"
-        Test = {Test-Path "./out/azurek8s"}
+        Test = { Test-Path "./out/azurek8s" }
         Set = {
             terraform apply "./out/out.plan" | Write-Host
             terraform output kube_config | Out-File ./out/azurek8s
-            $env:KUBECONFIG ="./out/azurek8s"
         }
     }
 )
@@ -101,12 +100,19 @@ $dockerReqs = @(
 # Kubernetes Deployment
 $k8sReqs = @(
     @{
+        Name = "Load Config"
+        Describe = "Load k8s config"
+        Set = {
+            $env:KUBECONFIG = "./out/azurek8s"
+        }
+    },
+    @{
         Name = "Deploy Application"
         Describe = "Application deployment"
         Set = {
             kubectl apply -f pod.yml
         }
-    }
+    },
     @{
         Name = "Set autoscale"
         Describe = "Configure Autoscale"
@@ -118,5 +124,5 @@ $k8sReqs = @(
 
 $azureReqs | Invoke-Requirement | Format-Checklist
 $provisionReqs | Invoke-Requirement | Format-Checklist
-$dockerReqs | Invoke-Requirement | Format-Checklist
+# $dockerReqs | Invoke-Requirement | Format-Checklist
 $k8sReqs | Invoke-Requirement | Format-Checklist
