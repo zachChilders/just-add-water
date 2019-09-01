@@ -14,10 +14,6 @@ jaw applies DevOps best practices to ensure that take you to production with con
 
 jaw applies defense in depth to existing codebases to establish a secure baseline and improve your security posture with every deployment.
 
-## Cloud Scale
-
-jaw won't pay your AWS bill, but it will work with whatever cloud you need and ensure that you don't have to worry about scale anymore.
-
 ## Dependencies
 
 We ship jaw in a VSCode dev container.  This means you only need to install the following:
