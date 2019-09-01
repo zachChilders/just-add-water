@@ -1,7 +1,11 @@
 $ErrorActionPreference = "STOP"
 
+# TODO: Set these better
+$tf_share = "zachterraformstorage"
+$tf_container = "tfstate"
+
 # Bootstrap Requirements
-if (-not (Get-Module Requirements)) {
+if (-not (Get-InstalledModule  Requirements)) {
     Install-Module Requirements -Force
 }
 Import-Module Requirements
@@ -27,7 +31,7 @@ $azureReqs = @(
             $SECRETS | % {
                 $SECRET=$(az keyvault secret show --name $_ --vault-name $KEYVAULTNAME | jq '.value' -r)
                 $NAME = $_.Replace("-", "_")
-                [Environment]::SetEnvironmentVariable($NAME, $SECRET)
+                [Environment]::SetEnvironmentVariable($NAME, $SECRET) | Write-Host
             }
         }
     }
@@ -49,35 +53,52 @@ $provisionReqs = @(
     @{
         Name = "Terraform init"
         Describe = "Initialize terraform environment"
-        Test = {Test-Path "./.terraform"}
+        Test = {Test-Path "$PSScriptRoot/.terraform"}
         Set = {
-            terraform init -backend-config="storage_account_name=zachterraformstorage" `
-            -backend-config="container_name=tfstate" `
-            -backend-config="access_key=$($env:terraform_storage_key)" `
-            -backend-config="key=mics.tfstate"
+            terraform init -backend-config="storage_account_name=$($tf_share)" -backend-config="container_name=tfstate" -backend-config="access_key=$($env:terraform_storage_key)" -backend-config="key=mics.tfstate" | Write-Host
         }
     },
     @{
         Name = "Terraform plan"
         Describe = "Plan terraform environment"
-        Test = {Test-Path "./out.plan"}
+        Test = {Test-Path "$PSScriptRoot/out/out.plan"}
         Set = {
-            terraform plan -out ./out.plan | Write-Host
+            mkdir "$PSScriptRoot/out"
+            terraform plan -out "$PSScriptRoot/out/out.plan" | Write-Host
         } 
     },
     @{
         Name = "Terraform Apply"
-        Describe = "Apply terraform plan"
-        Test = {Test-Path "./azurek8s"}
+        Describe = "Apply Terraform plan"
+        Test = {Test-Path "./out/azurek8s"}
         Set = {
-            terraform apply "./out.plan" | Write-Host
-            terraform output kube_config | Out-File ./azurek8s
-            $env:KUBECONFIG ="./azurek8s"
+            terraform apply "./out/out.plan" | Write-Host
+            terraform output kube_config | Out-File ./out/azurek8s
+            $env:KUBECONFIG ="./out/azurek8s"
         }
     }
 )
 
-# Kubernetes setup
+# Docker cooking
+$dockerReqs = @(
+    @{
+        Name = "Find Docker Services"
+        Describe = "Enumerate Containers"
+        Set = { 
+            $services = Get-ChildItem ./app
+        }
+    },
+    @{
+        Name = "Build Docker Containers"
+        Describe = "Build Docker"
+        Set = {
+            $services = Get-ChildItem ./app
+            Write-Host $services
+        }
+    }
+)
+
+# Kubernetes Deployment
 $k8sReqs = @(
     @{
         Name = "Deploy Application"
@@ -92,16 +113,10 @@ $k8sReqs = @(
         Set = {
             kubectl autoscale deployment mics-test --min=2 --max=5 --cpu-percent=80
         }
-    },
-    @{
-        Name = "Harden Cluster"
-        Describe = "Apply security policy"
-        Set = {
-            az aks update --resource-group azure-k8stest --name k8stest --enable-pod-security-policy
-        }
     }
 )
 
-$azureReqs | Invoke-Requirement | Format-CallStack
-$provisionReqs | Invoke-Requirement | Format-CallStack
-$k8sReqs | Invoke-Requirement | Format-CallStack
+$azureReqs | Invoke-Requirement | Format-Checklist
+$provisionReqs | Invoke-Requirement | Format-Checklist
+$dockerReqs | Invoke-Requirement | Format-Checklist
+$k8sReqs | Invoke-Requirement | Format-Checklist
