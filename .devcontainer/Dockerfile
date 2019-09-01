@@ -26,5 +26,5 @@ RUN apt-get update && apt-get -y install git procps jq \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
 
-ADD ./install-dependencies.ps1 ./install-dependencies.ps1
-RUN pwsh ./install-dependencies.ps1
+ADD ./Install-Dependencies.ps1 ./Install-Dependencies.ps1
+RUN pwsh ./Install-Dependencies.ps1

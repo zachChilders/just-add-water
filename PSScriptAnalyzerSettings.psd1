@@ -53,7 +53,7 @@
         }
         PSUseConsistentIndentation = @{
             Enable          = $false
-            IndentationSize = 4
+            IndentationSize = 2
             Kind            = "space"
         }
         PSUseConsistentWhitespace  = @{
