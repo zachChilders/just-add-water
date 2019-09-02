@@ -22,13 +22,15 @@ We ship jaw in a VSCode dev container.  This means you only need to install the 
 
 - VSCode
 
+- [Remote Containers Extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+
 You can then just do `code .` in the top level of this repo and follow VSCode's prompts to get a clean environment.  The first time you do this will take a couple
 minutes while it builds your environment.
 
 If you would prefer a purely native environment, you can install the following dependencies:
 
-- az cli
+- [az cli](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest)
 
-- Terraform
+- [Terraform](https://www.terraform.io/downloads.html)
 
-- kubectl
+- kubectl - `az aks install-cli`
