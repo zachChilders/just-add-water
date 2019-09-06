@@ -1,24 +1,22 @@
 variable "client_id" {}
 variable "client_secret" {}
+variable "ssh_public_key" {
+}
 
 variable "agent_count" {
     default = 3
 }
 
-variable "ssh_public_key" {
-    default = "~/.ssh/id_rsa.pub"
-}
-
 variable "dns_prefix" {
-    default = "k8stest"
+    default = "sbd"
 }
 
 variable cluster_name {
-    default = "k8stest"
+    default = "sbd"
 }
 
 variable resource_group_name {
-    default = "azure-k8stest"
+    default = "sbd"
 }
 
 variable location {
@@ -26,12 +24,12 @@ variable location {
 }
 
 variable log_analytics_workspace_name {
-    default = "zachmicstestLogAnalyticsWorkspaceName"
+    default = "sbdworkspace"
 }
 
 # refer https://azure.microsoft.com/global-infrastructure/services/?products=monitor for log analytics available regions
 variable log_analytics_workspace_location {
-    default = "eastus"
+    default = "westus"
 }
 
 # refer https://azure.microsoft.com/pricing/details/monitor/ for log analytics pricing 

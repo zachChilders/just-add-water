@@ -2,6 +2,7 @@ $ErrorActionPreference = "STOP"
 
 # TODO: Set these better
 $tf_share = "zachterraformstorage"
+$kv_name = "mics-kv"
 
 # Bootstrap Requirements
 if (-not (Get-InstalledModule  Requirements)) {
@@ -25,12 +26,12 @@ $azureReqs = @(
     Name     = "Keyvault Secrets"
     Describe = "Inject Secrets into Session"
     Set      = {
-      $KEYVAULTNAME="mics-kv"
+      $KEYVAULTNAME=$kv_name
       $SECRETS=( $(az keyvault secret list --vault-name $KEYVAULTNAME | jq '.[].id' -r | sed 's/.*\/\([^/]\+\)$/\1/') )
       $SECRETS | % {
         $SECRET=$(az keyvault secret show --name $_ --vault-name $KEYVAULTNAME | jq '.value' -r)
         $NAME = $_.Replace("-", "_")
-        [Environment]::SetEnvironmentVariable($NAME, $SECRET) | Write-Host
+        [Environment]::SetEnvironmentVariable($NAME, $SECRET)
       }
     }
   }
@@ -52,8 +53,9 @@ $provisionReqs = @(
   @{
     Name     = "Terraform init"
     Describe = "Initialize terraform environment"
-    Test     = { Test-Path "$PSScriptRoot/.terraform" }
+    Test     = { Test-Path "$PSScriptRoot/tf/.terraform" }
     Set      = {
+      Set-Location -Path "tf"
       terraform init -backend-config="storage_account_name=$($tf_share)" -backend-config="container_name=tfstate" -backend-config="access_key=$($env:terraform_storage_key)" -backend-config="key=mics.tfstate"
     }
   },
@@ -69,10 +71,11 @@ $provisionReqs = @(
   @{
     Name     = "Terraform Apply"
     Describe = "Apply Terraform plan"
-    Test     = { Test-Path "./out/azurek8s" }
+    Test     = { Test-Path "./out/azurek8s" } # TODO: probe infra for test
     Set      = {
-      terraform apply "./out/out.plan" | Write-Host
-      terraform output kube_config | Out-File ./out/azurek8s
+      terraform apply "../out/out.plan" | Write-Host
+      terraform output kube_config | Out-File ../out/azurek8s
+      Set-Location -Path ".."
     }
   }
 )
