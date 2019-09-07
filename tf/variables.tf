@@ -1,7 +1,8 @@
 variable "client_id" {}
 variable "client_secret" {}
-variable "ssh_public_key" {
-}
+variable "ssh_public_key" {}
+variable "sql_user" {}
+variable "sql_password" {}
 
 variable "agent_count" {
     default = 3

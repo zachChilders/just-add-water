@@ -80,8 +80,8 @@ resource "azurerm_mysql_server" "mysql" {
     geo_redundant_backup  = "Disabled"
   }
 
-  administrator_login          = "mysqladminun"
-  administrator_login_password = "H@Sh1CoR3!"
+  administrator_login          = "${var.sql_user}"
+  administrator_login_password = "${var.sql_password}"
   version                      = "5.7"
   ssl_enforcement              = "Enabled"
 }
