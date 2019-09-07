@@ -62,11 +62,34 @@ resource "azurerm_kubernetes_cluster" "k8s" {
     }
 }
 
-resource "azurerm_sql_server" "sql" {
-  name                         = "mics-pegasus"
-  resource_group_name          = "${azurerm_resource_group.rg.name}"
-  location                     = "West US"
-  version                      = "12.0"
-  administrator_login          = "4dm1n157r470r"
-  administrator_login_password = "4-v3ry-53cr37-p455w0rd"
+resource "azurerm_mysql_server" "mysql" {
+  name                = "mics-pegasus"
+  location            = "${azurerm_resource_group.rg.location}"
+  resource_group_name = "${azurerm_resource_group.rg.name}"
+
+  sku {
+    name     = "B_Gen5_2"
+    capacity = 2
+    tier     = "Basic"
+    family   = "Gen5"
+  }
+
+  storage_profile {
+    storage_mb            = 5120
+    backup_retention_days = 7
+    geo_redundant_backup  = "Disabled"
+  }
+
+  administrator_login          = "mysqladminun"
+  administrator_login_password = "H@Sh1CoR3!"
+  version                      = "5.7"
+  ssl_enforcement              = "Enabled"
+}
+
+resource "azurerm_mysql_database" "db" {
+  name                = "lamp"
+  resource_group_name = "${azurerm_resource_group.rg.name}"
+  server_name         = "${azurerm_mysql_server.mysql.name}"
+  charset             = "utf8"
+  collation           = "utf8_unicode_ci"
 }
