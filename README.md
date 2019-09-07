@@ -8,7 +8,7 @@ Just Add Water (jaw) is a template repo designed to Securely and Reliably deploy
 
 ## Reliable Automation
 
-jaw applies DevOps best practices to ensure that take you to production with confidence.
+jaw applies DevOps best practices that ensure you go to production with confidence.
 
 ## Secure By Design
 
