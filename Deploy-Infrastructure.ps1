@@ -64,8 +64,8 @@ $provisionReqs = @(
     Describe = "Plan terraform environment"
     Test     = { Test-Path "$PSScriptRoot/out/out.plan" }
     Set      = {
-      mkdir "$PSScriptRoot/out"
-      terraform plan -out "$PSScriptRoot/out/out.plan" | Write-Host
+      New-Item -Path "$PSScriptRoot/out" -ItemType Directory -Force
+      terraform plan -out "$PSScriptRoot/out/out.plan" | Write-Output
     }
   },
   @{
@@ -73,7 +73,7 @@ $provisionReqs = @(
     Describe = "Apply Terraform plan"
     Test     = { Test-Path "./out/azurek8s" } # TODO: probe infra for test
     Set      = {
-      terraform apply "../out/out.plan" | Write-Host
+      terraform apply "../out/out.plan" | Write-Output
       terraform output kube_config | Out-File ../out/azurek8s
       Set-Location -Path ".."
     }
