@@ -1,6 +1,6 @@
 # Just Add Water
 
-![Just Add Water](images/martians.png)
+![Just Add Water](.images/martians.png)
 
 ## Instant Cloud Scale, No Matter What You Deploy
 

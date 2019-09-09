@@ -2,5 +2,8 @@
 azurek8s
 
 #Ignore terraform output
-/tf/.terraform/
+/.terraform/
+terraform.tfstate
+terraform.tfstate.backup
 /out/
+/.test/out

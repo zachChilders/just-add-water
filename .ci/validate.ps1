@@ -24,7 +24,7 @@ $RepoRoot = "$PSScriptRoot/.."
   @{
     Describe = "Unit test"
     Test     = {
-      $results = Invoke-Pester $RepoRoot -PassThru
+      $results = Invoke-Pester "$RepoRoot/.test" -PassThru
       $results.FailedCount -eq 0
     }
   }
