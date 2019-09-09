@@ -64,8 +64,8 @@ $provisionReqs = @(
     Describe = "Plan terraform environment"
     Test     = { Test-Path "$PSScriptRoot/out/out.plan" }
     Set      = {
-      mkdir "$PSScriptRoot/out"
-      terraform plan -out "$PSScriptRoot/out/out.plan" | Write-Information
+      New-Item -Path "$PSScriptRoot/out" -ItemType Directory -Force
+      terraform plan -out "$PSScriptRoot/out/out.plan" | Write-Output
     }
   },
   @{
