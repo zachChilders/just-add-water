@@ -21,15 +21,15 @@ $azureReqs = @(
     Set      = { az login }
   },
   @{ # This could be done idempotently with a test,
-     # but refreshing the secrets every run allows for
-     # new secrets to be added easily
+    # but refreshing the secrets every run allows for
+    # new secrets to be added easily
     Name     = "Keyvault Secrets"
     Describe = "Inject Secrets into Session"
     Set      = {
-      $KEYVAULTNAME=$kv_name
-      $SECRETS=( $(az keyvault secret list --vault-name $KEYVAULTNAME | jq '.[].id' -r | sed 's/.*\/\([^/]\+\)$/\1/') )
+      $KEYVAULTNAME = $kv_name
+      $SECRETS = ( $(az keyvault secret list --vault-name $KEYVAULTNAME | jq '.[].id' -r | sed 's/.*\/\([^/]\+\)$/\1/') )
       $SECRETS | % {
-        $SECRET=$(az keyvault secret show --name $_ --vault-name $KEYVAULTNAME | jq '.value' -r)
+        $SECRET = $(az keyvault secret show --name $_ --vault-name $KEYVAULTNAME | jq '.value' -r)
         $NAME = $_.Replace("-", "_")
         [Environment]::SetEnvironmentVariable($NAME, $SECRET)
       }
@@ -73,7 +73,7 @@ $provisionReqs = @(
     Describe = "Apply Terraform plan"
     Test     = { Test-Path "./out/azurek8s" } # TODO: probe infra for test
     Set      = {
-      terraform apply "../out/out.plan" | Write-Output
+      terraform apply "../out/out.plan" | Write-Information
       terraform output kube_config | Out-File ../out/azurek8s
       Set-Location -Path ".."
     }
