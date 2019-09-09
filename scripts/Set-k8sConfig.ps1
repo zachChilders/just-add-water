@@ -46,4 +46,4 @@ Get-ChildItem $Path -Filter "Dockerfile" -Recurse `
   }
 } `
 | ConvertTo-Json `
-| Out-File -FilePath "$Path/out/k8s.json" -Force
+| Out-File -FilePath "$OutPath/k8s.json" -Force
