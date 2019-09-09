@@ -1,6 +1,7 @@
 {
   "recommendations": [
     "ms-vscode.powershell",
-    "mauve.terraform"
+    "mauve.terraform",
+    "ms-azuretools.vscode-docker"
   ]
 }

@@ -6,3 +6,4 @@ azurek8s
 terraform.tfstate
 terraform.tfstate.backup
 /out/
+/.test/out

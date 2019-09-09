@@ -1,52 +1,49 @@
+Param(
+  [ValidateScript( { Test-Path $_ } )]
+  [string]$Path
+)
+
+$ErrorActionPreference = "Stop"
+
+$OutPath = "$Path/out"
+
 # Class to hold Docker structure
 class Docker {
-    [String] $Name
-    [String] $Path
-    [Hashtable] $Commands
-    [Boolean] $Frontend # To identify which port serves traffic
+  [String] $Name
+  [String] $Path
+  [Hashtable] $Commands
+  [Boolean] $Frontend # To identify which port serves traffic
 }
 
-# Empty k8s config
-$k8sConfig = @()
+# create output path
+$OutPath `
+| ? { -not (Test-Path $_) } `
+| % { New-Item $_ -ItemType Directory }
 
-# Enumerate Dockerfiles
-$dockerfiles = Get-ChildItem -Recurse `
-| ? { $_.Name -like "Dockerfile" }
+# parse each Dockerfile in to a K8S JSON
+Get-ChildItem $Path -Filter "Dockerfile" -Recurse `
+| % {
+  # parse each Dockerfile directive into @{$command => $args}
+  $commands = @{ }
 
-# Build Config
-ForEach ($file in $dockerfiles) {
+  Get-Content $_.FullName `
+  | ? { $_ -notmatch "^\s*$" } `
+  | % {
+    # First word is cmd, all else is args
+    $words = $_ -split " "
+    $cmd = $words | Select -First 1
+    $args = $words | Select -Skip 1
 
-    # Hashtable to hold commands
-    $commands = @{ }
+    # set/append args in the command hash
+    $commands[$cmd] += $args
+  }
 
-    $file `
-    | % { Get-Content $_ } `
-    | % {
-        $line = $_ # Alias for readability
-        if ($line.length -gt 0) {
-            # First word is cmd, all else is args
-            $cmd = $line.split(" ")[0]
-            $args = $line.split(" ")[1..($line.length)]
-
-            # Only add unique commands, otherwise append new
-            if ($commands[$cmd]) {
-                $commands[$cmd] += $args
-            } else {
-                $commands[$cmd] = @($args)
-            }
-        }
-    }
-
-    # Build new Docker Object and append to config
-    $k8sConfig += (
-        [Docker] @{
-            Path     = $file
-            Name     = $file.FullName.split("/")[-2]
-            Commands = $commands
-            Frontend = $false
-        }
-    )
-}
-
-# Serialize to json config
-$k8sConfig | ConvertTo-Json | Out-File -FilePath "./out/k8s.json" -Force
+  [Docker] @{
+    Path     = $_.FullName
+    Name     = $_.FullName.split("/")[-2]
+    Commands = $commands
+    Frontend = $false
+  }
+} `
+| ConvertTo-Json `
+| Out-File -FilePath "$Path/out/k8s.json" -Force
