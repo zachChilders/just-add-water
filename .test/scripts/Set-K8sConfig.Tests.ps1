@@ -10,7 +10,7 @@ Describe "Set-K8sConfig" {
   AfterAll {
     Remove-Item $OutRoot -Recurse -Force
   }
-  It "Should create a Json for every Dockerfile" {
+  It "Should create a Json" {
     Test-Path "$OutRoot/k8s.json" | Should -BeTrue
   }
   It "Json should contain string" -Skip {
