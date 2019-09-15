@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - "*"
+      - "!master"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Validate
+        shell: pwsh
+        run: |
+          Import-Module .
+          Invoke-Callstack -Name validate
+      - name: Deploy INT topology
+        shell: pwsh
+        run: |
+          Import-Module .
+          $id = (New-Guid).ToString().Substring(7)
+          $cluster = @{Ring = "int"; Geo = "us"; Region = "westus"; Cluster = $id}
+          Invoke-CallStack -Name system -Filter -Parameters $cluster

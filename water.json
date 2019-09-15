@@ -1,0 +1,4 @@
+{
+  "WaitBetweenClusterDeploymentsHours": 0.25,
+  "AzureSubscriptionId": ""
+}

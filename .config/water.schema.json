@@ -1,0 +1,10 @@
+{
+  "properties": {
+    "WaitBetweenClusterDeploymentsHours": {
+      "type": "number"
+    },
+    "AzureSubscriptionId": {
+      "type": "string"
+    }
+  }
+}
