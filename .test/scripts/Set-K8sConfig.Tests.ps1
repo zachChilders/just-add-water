@@ -17,7 +17,3 @@
 #     Get-Content "$OutRoot/k8s.json" -Raw | Should -Match "hello world"
 #   }
 # }
-
-It "Should fail" {
-  $false | Should -BeTrue
-}
