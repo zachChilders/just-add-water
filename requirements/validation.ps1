@@ -34,7 +34,7 @@ Import-Module "$RepoRoot/jawctl.psd1"
 @{
   Describe = "Unit test"
   Test     = {
-    $results = Invoke-Pester "$RepoRoot/.test" -PassThru
+    $results = Invoke-Pester "$RepoRoot/.test" -Show None -PassThru
     $results.FailedCount -eq 0
   }
 }

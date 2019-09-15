@@ -14,7 +14,13 @@ function Add-Cluster {
 }
 
 function Remove-Cluster {
+  [CmdletBinding(SupportsShouldProcess)]
+  Param()
+
   throw "NYI"
+  if ($PSCmdlet.ShouldProcess($_, "")) {
+
+  }
 }
 
 function Select-Cluster {
