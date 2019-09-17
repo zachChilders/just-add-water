@@ -7,3 +7,4 @@ terraform.tfstate
 terraform.tfstate.backup
 /out/
 /.test/out
+.DS_Store
