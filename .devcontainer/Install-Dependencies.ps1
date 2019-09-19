@@ -5,14 +5,6 @@ Install-Module -Name Requirements -Force
 
 Import-Module -Name Requirements
 
-$basecli = @(
-  @{
-    Name     = "Install cURL"
-    Describe = "Install cURL"
-    Test     = { (which curl).length -gt 0 }
-    Set      = { apt-get update; apt-get -y -qq install curl }
-  }
-)
 
 $azurecli = @(
   @{
@@ -57,7 +49,6 @@ $kubectl = @(
   }
 )
 
-$basecli | Invoke-Requirement | Format-CallStack
 $azurecli | Invoke-Requirement | Format-CallStack
 $terraform | Invoke-Requirement | Format-CallStack
 $kubectl | Invoke-Requirement | Format-CallStack
