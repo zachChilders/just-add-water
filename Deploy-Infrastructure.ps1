@@ -4,11 +4,12 @@ $ErrorActionPreference = "STOP"
 $tf_share = "zachterraformstorage"
 $kv_name = "mics-kv"
 
-# Bootstrap Requirements
-if (-not (Get-InstalledModule  Requirements)) {
-    Install-Module Requirements -Force
+"Requirements", "./modules/jaw.psm1" | % {
+    if (-not (Get-InstalledModule  $_)) {
+        Install-Module $_ -Force
+    }
+    Import-Module $_
 }
-Import-Module Requirements
 
 # Auth Azure and gather subscription secrets
 $azureReqs = @(
@@ -93,15 +94,18 @@ $dockerReqs = @(
         Name     = "Build Docker Containers"
         Describe = "Build all containers"
         Set      = {
-            $list = Get-ChildItem ./out/k8s.json | ConvertFrom-Json
-            $list | % { docker build -t $_.Name $_.Path }
+            $list = Get-Content ./out/k8s.json | ConvertFrom-Json
+            $list | % { docker build -t "mics233.azurecr.io/$($_.Name)" $_.Path }
         }
     },
     @{
         Name     = "Push Containers"
         Describe = "Push all containers"
         Set      = {
-            az acr push
+            docker login -n-mics233.azurecr.io -u mics233 -p $env:acrpassword
+
+            $list = Get-Content ./out/k8s.json | ConvertFrom-Json
+            $list | % { docker push "mics233.azurecr.io/$($_.Name)" }
         }
     }
 )
