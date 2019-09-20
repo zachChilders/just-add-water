@@ -1,10 +1,14 @@
-$ErrorActionPreference = "STOP"
+Set-StrictMode -Version Latest
+$ErrorActionPreference = "Stop"
 
 # TODO: Set these better
 $tf_share = "zachterraformstorage"
 $kv_name = "mics-kv"
+$acr_name = "mics233.azurecr.io"
 
-"Requirements", "./modules/jaw.psm1" | % {
+Import-Module -Name "./modules/jaw"
+
+"Requirements" | % {
     if (-not (Get-InstalledModule  $_)) {
         Install-Module $_ -Force
     }
@@ -19,9 +23,9 @@ $azureReqs = @(
         Test     = {
             (az account show | ConvertFrom-Json).state -eq "Enabled"
         }
-        Set      = { az login }
+        Set      = { az login | Out-Null }
     },
-    @{ # This could be done idempotently with a test,
+    @{  # This could be done idempotently with a test,
         # but refreshing the secrets every run allows for
         # new secrets to be added easily
         Name     = "Keyvault Secrets"
@@ -41,23 +45,12 @@ $azureReqs = @(
 # Provision Infra
 $provisionReqs = @(
     @{
-        Name     = "Transform Environment Variables"
-        Describe = "Transform Terraform Variables"
-        Test     = {
-            $env:TF_VAR_client_id.Length -gt 0 -and $env:TF_VAR_client_secret.Length -gt 0
-        }
-        Set      = {
-            $env:TF_VAR_client_id = $env:ARM_CLIENT_ID
-            $env:TF_VAR_client_secret = $env:ARM_CLIENT_SECRET
-        }
-    },
-    @{
         Name     = "Terraform init"
         Describe = "Initialize terraform environment"
         Test     = { Test-Path "$PSScriptRoot/tf/.terraform" }
         Set      = {
             Set-Location -Path "tf"
-            terraform init -backend-config="storage_account_name=$($tf_share)" -backend-config="container_name=tfstate" -backend-config="access_key=$($env:terraform_storage_key)" -backend-config="key=mics.tfstate"
+            terraform init -backend-config="storage_account_name=$($tf_share)" -backend-config="container_name=tfstate" -backend-config="access_key=$($env:terraform_storage_key)" -backend-config="key=mics.tfstate" | Out-Null
         }
     },
     @{
@@ -66,16 +59,15 @@ $provisionReqs = @(
         Test     = { Test-Path "$PSScriptRoot/out/out.plan" }
         Set      = {
             New-Item -Path "$PSScriptRoot/out" -ItemType Directory -Force
-            terraform plan -out "$PSScriptRoot/out/out.plan" | Write-Output
+            terraform plan -out "$PSScriptRoot/out/out.plan" | Out-Null
         }
     },
     @{
         Name     = "Terraform Apply"
         Describe = "Apply Terraform plan"
-        Test     = { Test-Path "./out/azurek8s" } # TODO: probe infra for test
         Set      = {
-            terraform apply "../out/out.plan" | Write-Information
-            terraform output kube_config | Out-File ../out/azurek8s
+            terraform apply "$PSScriptRoot/out/out.plan" | Write-Information
+            terraform output kube_config | Out-File "$PSScriptRoot/out/azurek8s"
             Set-Location -Path ".."
         }
     }
@@ -87,7 +79,7 @@ $dockerReqs = @(
         Name     = "Find Docker Services"
         Describe = "Enumerate Containers"
         Set      = {
-            ./scripts/Set-k8sConfig.ps1
+            Set-k8sConfig
         }
     },
     @{
@@ -95,17 +87,19 @@ $dockerReqs = @(
         Describe = "Build all containers"
         Set      = {
             $list = Get-Content ./out/k8s.json | ConvertFrom-Json
-            $list | % { docker build -t "mics233.azurecr.io/$($_.Name)" $_.Path }
+            $list | % { docker build -t "$acr_name/$($_.Name)" $_.Path }
+            $null
         }
     },
     @{
         Name     = "Push Containers"
         Describe = "Push all containers"
         Set      = {
-            docker login -n-mics233.azurecr.io -u mics233 -p $env:acrpassword
+            docker login $acr_name -u mics233 -p $env:acrpassword
 
             $list = Get-Content ./out/k8s.json | ConvertFrom-Json
-            $list | % { docker push "mics233.azurecr.io/$($_.Name)" }
+            $list | % { docker push "$acr_name/$($_.Name)" }
+            $null
         }
     }
 )
@@ -124,6 +118,7 @@ $k8sReqs = @(
         Describe = "Application deployment"
         Set      = {
             kubectl apply -f pod.yml
+            $null
         }
     },
     @{
