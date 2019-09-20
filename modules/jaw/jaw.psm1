@@ -9,7 +9,7 @@ class Docker {
 }
 
 class Deployment {
-    
+
 }
 
 function Set-k8sConfig {
