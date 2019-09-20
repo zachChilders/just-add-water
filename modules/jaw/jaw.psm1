@@ -15,7 +15,7 @@ class Deployment {
 function Set-k8sConfig {
     [CmdletBinding(SupportsShouldProcess = $true)]
     param(
-        [String]$Path = "out"
+        [String]$Path = "$PSScriptRoot/out"
     )
 
     # parse each Dockerfile in to a K8S JSON

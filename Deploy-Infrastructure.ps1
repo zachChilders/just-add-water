@@ -20,10 +20,8 @@ $azureReqs = @(
     @{
         Name     = "Azure Login"
         Describe = "Authenticate Azure Session"
-        Test     = {
-            (az account show | ConvertFrom-Json).state -eq "Enabled"
-        }
-        Set      = { az login | Out-Null }
+        Test     = { [Boolean] (az account show) }
+        Set      = { az login }
     },
     @{  # This could be done idempotently with a test,
         # but refreshing the secrets every run allows for
@@ -50,7 +48,7 @@ $provisionReqs = @(
         Test     = { Test-Path "$PSScriptRoot/tf/.terraform" }
         Set      = {
             Set-Location -Path "tf"
-            terraform init -backend-config="storage_account_name=$($tf_share)" -backend-config="container_name=tfstate" -backend-config="access_key=$($env:terraform_storage_key)" -backend-config="key=mics.tfstate" | Out-Null
+            terraform init -backend-config="storage_account_name=$($tf_share)" -backend-config="container_name=tfstate" -backend-config="access_key=$($env:terraform_storage_key)" -backend-config="key=mics.tfstate"
         }
     },
     @{
@@ -59,7 +57,7 @@ $provisionReqs = @(
         Test     = { Test-Path "$PSScriptRoot/out/out.plan" }
         Set      = {
             New-Item -Path "$PSScriptRoot/out" -ItemType Directory -Force
-            terraform plan -out "$PSScriptRoot/out/out.plan" | Out-Null
+            terraform plan -out "$PSScriptRoot/out/out.plan"
         }
     },
     @{
@@ -88,7 +86,6 @@ $dockerReqs = @(
         Set      = {
             $list = Get-Content ./out/k8s.json | ConvertFrom-Json
             $list | % { docker build -t "$acr_name/$($_.Name)" $_.Path }
-            $null
         }
     },
     @{
@@ -99,7 +96,6 @@ $dockerReqs = @(
 
             $list = Get-Content ./out/k8s.json | ConvertFrom-Json
             $list | % { docker push "$acr_name/$($_.Name)" }
-            $null
         }
     }
 )
@@ -118,7 +114,6 @@ $k8sReqs = @(
         Describe = "Application deployment"
         Set      = {
             kubectl apply -f pod.yml
-            $null
         }
     },
     @{
