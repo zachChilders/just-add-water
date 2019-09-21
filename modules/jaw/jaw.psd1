@@ -23,12 +23,6 @@
     # Author of this module
     Author            = 'Zach Childers'
 
-    # Company or vendor of this module
-    CompanyName       = 'Unknown'
-
-    # Copyright statement for this module
-    Copyright         = '(c) root. All rights reserved.'
-
     # Description of the functionality provided by this module
     # Description = ''
 

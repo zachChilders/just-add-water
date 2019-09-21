@@ -11,6 +11,12 @@ class Docker {
     [boolean] $Frontend # To identify which port serves traffic
 }
 
+<#
+.SYNOPSIS
+  Transforms data from a hashtable into a config template.
+.NOTES
+  Works on any type of config.  Replaces "{{varname}}" => $varname.
+#>
 function Expand-Template {
     [CmdletBinding()]
     [OutputType([String])]
@@ -27,6 +33,12 @@ function Expand-Template {
     $instance
 }
 
+<#
+.SYNOPSIS
+  Generates a config JSON based on contents of an /app folder.
+.NOTES
+  Searches for dockerfiles and saves information about them for later use.
+#>
 function Set-k8sConfig {
     [CmdletBinding(SupportsShouldProcess = $true)]
     param(
