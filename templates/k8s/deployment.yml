@@ -1,0 +1,18 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: {{deploy_name}}
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: {{deploy_name}}
+    spec:
+      nodeSelector:
+        "beta.kubernetes.io/os": linux
+      containers:
+        - name: {{image_name}}
+          image: {{cr_name}}/{{image_name}}
+          ports:
+            - containerPort: {{port}}
