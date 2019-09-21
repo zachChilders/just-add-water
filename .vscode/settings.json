@@ -1,5 +1,9 @@
 {
-    "powershell.scriptAnalysis.settingsPath": "PSScriptAnalyzerSettings.psd1",
+    "editor.formatOnSave": true,
     "files.autoGuessEncoding": true,
-    "editor.formatOnSave": true
+    "powershell.debugging.createTemporaryIntegratedConsole": true,
+    "powershell.enableProfileLoading": false,
+    "powershell.scriptAnalysis.enable": true,
+    "powershell.scriptAnalysis.settingsPath": "PSScriptAnalyzerSettings.psd1",
+    "powershell.startAutomatically": true
 }

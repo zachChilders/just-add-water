@@ -1,0 +1,3 @@
+[submodule "app/docker-magento2"]
+	path = app/docker-magento2
+	url = https://github.com/alexcheng1982/docker-magento2.git

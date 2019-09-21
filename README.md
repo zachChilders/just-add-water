@@ -8,11 +8,20 @@ Just Add Water (jaw) is a template repo designed to Securely and Reliably deploy
 
 ## Reliable Automation
 
-jaw applies DevOps best practices that ensure you go to production with confidence.
+jaw applies DevOps best practices that ensure you go to production with confidence.  It leverages [microsoft/Requirements](https://github.com/microsoft/Requirements) in order to declaratively create and configure secure cloud infrastructure with no necessary user action.
+
+We currently are focused on Azure based infrastructure, but want to support as many environments as possible.
 
 ## Secure By Design
 
 jaw applies defense in depth to existing codebases to establish a secure baseline and improve your security posture with every deployment.
+
+## Usage
+
+1. Generate a new repo using [this repo as a template](https://github.com/zachChilders/just-add-water/generate)
+2. `git submodule add` whatever docker application you need.
+3. Run deploy.ps1
+
 
 ## Dependencies
 
@@ -34,3 +43,7 @@ If you would prefer a purely native environment, you can install the following d
 - [Terraform](https://www.terraform.io/downloads.html)
 
 - kubectl - `az aks install-cli`
+
+You also will need to have access to an Azure subscription with the following dedicated resources available to your user account:
+- Container Registry
+- Key Vault
