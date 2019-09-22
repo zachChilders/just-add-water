@@ -19,6 +19,7 @@ if ($issues) {
 }
 
 Set-Location ./tf
+terraform init
 $tflint = terraform validate
 if (-not $tflint) {
     throw "Encountered Terraform lint issues"
