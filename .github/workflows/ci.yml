@@ -15,7 +15,7 @@ jobs:
       - name: Validate
         shell: pwsh
         run: |
-          ../validate.ps1
+          validate.ps1
       # - name: Deploy INT topology
       #   shell: pwsh
       #   run: |
