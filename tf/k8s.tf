@@ -10,7 +10,7 @@ resource "azurerm_log_analytics_workspace" "law" {
   sku                 = "${var.log_analytics_workspace_sku}"
 }
 
-resoasdfurce "azurerm_log_analytics_solution" "las" {
+resource "azurerm_log_analytics_solution" "las" {
   solution_name         = "ContainerInsights"
   location              = "${azurerm_log_analytics_workspace.law.location}"
   resource_group_name   = "${azurerm_resource_group.rg.name}"
