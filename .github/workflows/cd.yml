@@ -1,0 +1,33 @@
+name: CD
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - "Requirements.psd1"
+      - "LICENSE"
+      - "src/*"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Validate
+        shell: pwsh
+        run: |
+          Import-Module .
+          Invoke-CallStack validate
+      - name: Deploy INT topology
+        shell: pwsh
+        run: |
+          Import-Module .
+          $id = (New-Guid).ToString().Substring(7)
+          Invoke-CallStack -Name system -Filter "int-us-westus-$id"
+      - name: Deploy TEST topology
+        shell: pwsh
+        run: |
+          Import-Module .
+          Invoke-CallStack -Name system -Filter "test-us-westus-*"
