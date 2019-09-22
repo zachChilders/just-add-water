@@ -13,9 +13,8 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: Validate
-        shell: pwsh
         run: |
-          .github/validate.ps1
+          pwsh ./.github/validate.ps1
       # - name: Deploy INT topology
       #   shell: pwsh
       #   run: |
