@@ -1,7 +1,5 @@
 $ErrorActionPreference = "Stop"
 
-$RepoRoot = "$PSScriptRoot/.."
-
 # Class to hold Docker structure
 class Docker {
     [string] $Name
