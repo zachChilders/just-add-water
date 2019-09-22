@@ -39,7 +39,6 @@ Describe "Expand-Template" {
     It "Should create a yaml" {
         Test-Path "$OutRoot/test.yml" | Should -BeTrue
     }
-
     It "Yaml should contain string " {
         Get-Content "$OutRoot/test.yml" | Join-String -Separator "`n" | Should -Match "name: Hello"
     }
