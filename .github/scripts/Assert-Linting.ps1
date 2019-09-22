@@ -19,9 +19,9 @@ if ($issues) {
 }
 
 Invoke-WebRequest "https://github.com/wata727/tflint/releases/download/v0.7.4/tflint_linux_amd64.zip" -OutFile "/tmp/tflint_linux_amd64.zip"
-Expand-Archive /tmp/tflint_linux_amd64.zip -d /usr/local/bin
+Expand-Archive /tmp/tflint_linux_amd64.zip -d /tmp
 
-tflint ./tf
+/tmp/tflint ./tf
 if (-not $?) {
     throw "Terraform linting failed"
 }
