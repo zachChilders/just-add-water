@@ -17,10 +17,3 @@ if ($issues) {
     $issues | Format-Table
     throw "Encountered $($issues.Count) linting issues"
 }
-
-Set-Location ./tf
-terraform init
-$tflint = terraform validate
-if (-not $tflint) {
-    throw "Encountered Terraform lint issues"
-}
