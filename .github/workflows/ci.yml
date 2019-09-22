@@ -15,3 +15,6 @@ jobs:
       - name: Lint code
         shell: pwsh
         run: ./.github/scripts/Assert-Linting
+      - name: Test code
+        shell: pwsh
+        run: ./.github/scripts/Assert-Tests

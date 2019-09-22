@@ -1,0 +1,4 @@
+apiVersion: apps/v1beta1
+kind: test
+metadata:
+  name: {{test_name}}

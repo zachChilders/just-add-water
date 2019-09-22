@@ -42,13 +42,12 @@ function Expand-Template {
 function Set-k8sConfig {
     [CmdletBinding(SupportsShouldProcess = $true)]
     param(
-        [string]$AppPath = "$RepoRoot/app",
-        [string]$OutPath = "$RepoRoot/out"
+        [string] $AppPath,
+        [string] $OutPath
     )
-
     # parse each Dockerfile in to a K8S JSON
     # we only check for top level dockerfiles right now.
-    Get-ChildItem -Filter "*dockerfile*" -Recurse `
+    Get-ChildItem -Path $AppPath -Filter "*dockerfile*" -Recurse `
     | % {
         # parse each Dockerfile directive into @{$command => $args}
         $commands = @{ }
