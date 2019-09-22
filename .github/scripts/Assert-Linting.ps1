@@ -18,10 +18,8 @@ if ($issues) {
     throw "Encountered $($issues.Count) linting issues"
 }
 
-Invoke-WebRequest "https://github.com/wata727/tflint/releases/download/v0.7.4/tflint_linux_amd64.zip" -OutFile "/tmp/tflint_linux_amd64.zip"
-Expand-Archive /tmp/tflint_linux_amd64.zip -d /tmp
-
-/tmp/tflint ./tf
-if (-not $?) {
-    throw "Terraform linting failed"
+Set-Location ./tf
+$tflint = terraform validate
+if (-not $tflint) {
+    throw "Encountered Terraform lint issues"
 }

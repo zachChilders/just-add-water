@@ -12,6 +12,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v1
-      - name: Validate Powershell
+      - name: Lint code
         shell: pwsh
         run: ./.github/scripts/Assert-Linting
