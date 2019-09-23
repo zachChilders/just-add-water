@@ -16,7 +16,9 @@
         "/var/run/docker.sock:/var/run/docker.sock"
     ],
     "extensions": [
-        "ms-vscode.powershell"
+        "ms-vscode.powershell",
+        "mauve.terraform",
+        "ms-azuretools.vscode-docker"
     ],
     "settings": {
         "remote.extensionKind": {

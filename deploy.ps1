@@ -129,7 +129,7 @@ $k8sReqs = @(
                     "deploy_name" = "pegasus"
                     "image_name"  = $_.ImageName
                     "cr_name"     = $acr_name
-                    "port"        = 80
+                    "port"        = $_.Ports
                 }
                 Expand-Template -Template $deploy_template -Data $deploy_data | Out-File $OutputDir/pod.yml -Append
                 "---" | Out-File $OutputDir/pod.yml -Append
@@ -137,7 +137,7 @@ $k8sReqs = @(
 
             $service_data = @{
                 "service_name" = "pegasus"
-                "port"         = 80
+                "port"         = 80 # This needs to enforce 443 - See issue #41
             }
             Expand-Template -Template $service_template -Data $service_data | Out-File $OutputDir/pod.yml -Append
         }
@@ -160,7 +160,7 @@ $k8sReqs = @(
     @{
         Name     = "Harden Cluster"
         Describe = "Apply security policy"
-        Test = { kubectl get psp } # Improve tests
+        Test     = { kubectl get psp } # Improve tests
         Set      = {
             # Install the aks-preview extension
             az extension add --name aks-preview

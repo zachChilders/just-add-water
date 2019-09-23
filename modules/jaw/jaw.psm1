@@ -5,7 +5,7 @@ class Docker {
     [string] $Name
     [string] $ImageName
     [string] $Path
-    [hashtable] $Commands
+    [string[]] $Ports
     [boolean] $Frontend # To identify which port serves traffic
 }
 
@@ -47,26 +47,17 @@ function Set-k8sConfig {
     # we only check for top level dockerfiles right now.
     Get-ChildItem -Path $AppPath -Filter "*dockerfile*" -Recurse `
     | % {
-        # parse each Dockerfile directive into @{$command => $args}
-        $commands = @{ }
-        Get-Content $_.FullName `
-        | ? { $_ -notmatch "^\s*$" } `
-        | % {
-            # First word is cmd, all else is args
-            $words = $_ -split " "
-            $cmd = $words | Select -First 1
-            $args = $words | Select -Skip 1
+        $Name = $_.FullName
+        $ImageName = $Name.Split("/")[4].ToLower()
+        $Path = $_.Directory
+        $Ports = docker inspect mics233.azurecr.io/$ImageName --format="{{json .Config}}"
+        $Ports = ($Ports | ConvertFrom-Json -AsHashtable).ExposedPorts.Keys | % { ($_ -split "/")[0] }
 
-            # set/append args in the command hash
-            if (-not [string]::IsNullOrEmpty($cmd)) {
-                $commands[$cmd] += $args
-            }
-        }
         [Docker] @{
-            Name      = $_.FullName
-            ImageName = $_.FullName.Split("/")[4].ToLower() # the foldername after /app
-            Path      = $_.DirectoryName
-            Commands  = $commands
+            Name      = $Name
+            ImageName = $ImageName
+            Path      = $Path
+            Ports     = $Ports
             Frontend  = $false
         }
     } `
