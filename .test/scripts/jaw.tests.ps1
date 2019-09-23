@@ -16,7 +16,7 @@ Describe "Set-K8sConfig" {
         Test-Path "$OutRoot/k8s.json" | Should -BeTrue
     }
     It "Json should contain string" {
-        Get-Content "$OutRoot/k8s.json" -Raw | Should -Match "hello"
+        Get-Content "$OutRoot/k8s.json" -Raw | Should -Match "data"
     }
     It "Parses back to an Object" {
         Get-Content "$OutRoot/k8s.json" -Raw | ConvertFrom-Json | Select "Name" | Should -Match "test.dockerfile"
@@ -34,7 +34,7 @@ Describe "Expand-Template" {
         | Out-File "$OutRoot\test.yml"
     }
     AfterAll {
-        Remove-Item $OutRoot -Recurse -Force
+        #Remove-Item $OutRoot -Recurse -Force
     }
     It "Should create a yaml" {
         Test-Path "$OutRoot/test.yml" | Should -BeTrue
