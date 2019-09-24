@@ -7,7 +7,7 @@ Describe "Set-K8sConfig" {
     BeforeAll {
         Import-Module $RepoRoot/modules/jaw
         New-Item -Path $OutRoot -ItemType Directory -Force
-        docker build -t "mics233.azurecr.io/data" "$RepoRoot/.test/data" -f "$RepoRoot/.test/data/test.dockerfile"
+        docker build -t "mics233.azurecr.io/data" "./.test/data" -f "./.test/data/test.dockerfile"
         Set-K8sConfig -AppPath "$ScriptsRoot/../data" -OutPath $OutRoot
     }
     AfterAll {
