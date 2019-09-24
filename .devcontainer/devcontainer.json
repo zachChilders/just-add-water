@@ -22,7 +22,6 @@
     "settings": {
         "remote.extensionKind": {
             "ms-azuretools.vscode-docker": "workspace"
-        },
-        "workbench.colorTheme": "Quiet Light"
+        }
     }
 }
