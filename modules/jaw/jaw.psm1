@@ -48,7 +48,7 @@ function Set-k8sConfig {
     Get-ChildItem -Path $AppPath -Filter "*dockerfile*" -Recurse `
     | % {
         $Name = $_.FullName
-        $ImageName = $Name.Split("/")[4].ToLower()
+        $ImageName = (($Name -Split "/app/")[1] -Split "/")[0]
         $Path = $_.Directory
         $Ports = docker inspect mics233.azurecr.io/$ImageName --format="{{json .Config}}"
         $Ports = ($Ports | ConvertFrom-Json -AsHashtable).ExposedPorts.Keys | % { ($_ -split "/")[0] }
