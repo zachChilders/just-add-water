@@ -58,6 +58,7 @@ function Set-k8sConfig {
     # Extract port numbers out of config
     $Ports = ($Config | ConvertFrom-Json -AsHashtable).ExposedPorts.Keys | % { ($_ -split "/")[0] }
 
+    # Build a model for serialization
     [Docker] @{
       Name      = $Name
       ImageName = $ImageName
