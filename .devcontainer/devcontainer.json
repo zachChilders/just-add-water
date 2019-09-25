@@ -8,12 +8,12 @@
     "runArgs": [
         "-v",
         "/var/run/docker.sock:/var/run/docker.sock",
-        "-v",
-        "${env:HOME}${env:USERPROFILE}/.ssh:/root/.ssh-localhost:ro",
+        // "-v",
+        // "${env:HOME}${env:USERPROFILE}/.ssh:/root/.ssh:ro",
         "-u",
         "1000"
     ],
-    "postCreateCommand": "mkdir -p ~/.ssh && cp -r ~/.ssh-localhost/* ~/.ssh && chmod 700 ~/.ssh && chmod 600 ~/.ssh/*",
+    // "postCreateCommand": "mkdir -p ~/.ssh && cp -r ~/.ssh/* ~/.ssh && chmod 700 ~/.ssh && chmod 600 ~/.ssh/*",
     "extensions": [
         "ms-vscode.powershell",
         "mauve.terraform",
@@ -22,7 +22,6 @@
     "settings": {
         "remote.extensionKind": {
             "ms-azuretools.vscode-docker": "workspace"
-        },
-        "workbench.colorTheme": "Quiet Light"
+        }
     }
 }
