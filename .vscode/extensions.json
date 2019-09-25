@@ -2,6 +2,7 @@
   "recommendations": [
     "ms-vscode.powershell",
     "mauve.terraform",
-    "ms-azuretools.vscode-docker"
+    "ms-azuretools.vscode-docker",
+    "ms-vscode-remote.remote-containers"
   ]
 }
