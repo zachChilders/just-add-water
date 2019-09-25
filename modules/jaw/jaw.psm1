@@ -2,11 +2,19 @@ $ErrorActionPreference = "Stop"
 
 # Class to hold Docker structure
 class Docker {
+  <<<<<<< HEAD
   [string] $Name
   [string] $ImageName
   [string] $Path
   [string[]] $Ports
   [boolean] $Frontend # To identify which port serves traffic
+  =======
+  [string] $Name
+  [string] $ImageName
+  [string] $Path
+  [string[]] $Ports
+  [boolean] $Frontend # To identify which port serves traffic
+  >>>>>>> better docker parsing
 }
 
 <#
