@@ -19,9 +19,8 @@ jaw applies defense in depth to existing codebases to establish a secure baselin
 ## Usage
 
 1. Generate a new repo using [this repo as a template](https://github.com/zachChilders/just-add-water/generate)
-2. `git submodule add` whatever docker application you need.
+2. `git submodule update` whatever docker application you need.
 3. Run deploy.ps1
-
 
 ## Dependencies
 

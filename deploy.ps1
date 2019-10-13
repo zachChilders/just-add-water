@@ -47,13 +47,16 @@ $tfReqs = @(
     @{
         Name     = "Terraform init"
         Describe = "Initialize terraform environment"
-        Test     = { Test-Path "$PSScriptRoot/tf/.terraform" }
+        Test     = { Test-Path "$PSScriptRoot/tf/.terraform/terraform.tfstate" }
         Set      = {
             Set-Location -Path "tf"
             terraform init -backend-config="storage_account_name=$($tf_share)" `
                 -backend-config="container_name=tfstate" `
                 -backend-config="access_key=$($env:terraform_storage_key)" `
                 -backend-config="key=mics.tfstate"
+
+            # Ensure state is synchronized across deployments with production
+            terraform refresh
         }
     },
     @{
