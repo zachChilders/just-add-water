@@ -83,9 +83,13 @@ $tfReqs = @(
 # Docker cooking
 $dockerReqs = @(
     @{
-        Name     = "Find Docker Services"
-        Describe = "Enumerate Containers"
+        Name     = "Generate Config File"
+        Describe = "Generate JSON"
         Set      = {
+            $DockerImages = az acr repository list -n mics233 -o json | ConvertFrom-Json
+            Get-ContainerNames | % {
+                if ($ImageName -in $DockerImages) { docker pull mics233.azurecr.io/$ImageName }
+            }
             Set-k8sConfig -AppPath "./app" -OutPath "./out"
         }
     },

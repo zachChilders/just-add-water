@@ -2,9 +2,9 @@ $ErrorActionPreference = "STOP"
 
 # Bootstrap Requirements
 
-"Requirements", "powershell-yaml" | % {
+"Requirements" | % {
     Install-Module -Name $_ -Force
-    Import-Module -Name Requirements
+    Import-Module -Name $_
 }
 
 $azurecli = @(
