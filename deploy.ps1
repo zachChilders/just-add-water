@@ -1,5 +1,4 @@
 $ErrorActionPreference = "Stop"
-# $PSScriptRoot = "~/dev/just-add-water"
 $RepoRoot = $PSScriptRoot
 $OutputDir = "$PSScriptRoot/out"
 
