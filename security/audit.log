@@ -1,0 +1,510 @@
+# ------------------------------------------------------------------------------
+# Docker Bench for Security v1.3.4
+#
+# Docker, Inc. (c) 2015-
+#
+# Checks for dozens of common best-practices around deploying Docker containers in production.
+# Inspired by the CIS Docker Community Edition Benchmark v1.1.0.
+# ------------------------------------------------------------------------------
+
+Initializing Sun Oct 20 19:59:11 UTC 2019
+
+
+[INFO] 1 - Host Configuration
+[WARN] 1.1  - Ensure a separate partition for containers has been created
+[NOTE] 1.2  - Ensure the container host has been Hardened
+[INFO] 1.3  - Ensure Docker is up to date
+[INFO]      * Using 3.0.6, verify is it up to date as deemed necessary
+[INFO]      * Your operating system vendor may provide support and security maintenance for Docker
+[INFO] 1.4  - Ensure only trusted users are allowed to control Docker daemon
+[INFO]      * docker:x:117:ubuntu
+[WARN] 1.5  - Ensure auditing is configured for the Docker daemon
+[WARN] 1.6  - Ensure auditing is configured for Docker files and directories - /var/lib/docker
+[WARN] 1.7  - Ensure auditing is configured for Docker files and directories - /etc/docker
+[INFO] 1.8  - Ensure auditing is configured for Docker files and directories - docker.service
+[INFO]      * File not found
+[INFO] 1.9  - Ensure auditing is configured for Docker files and directories - docker.socket
+[INFO]      * File not found
+[INFO] 1.10  - Ensure auditing is configured for Docker files and directories - /etc/default/docker
+[INFO]      * File not found
+[WARN] 1.11  - Ensure auditing is configured for Docker files and directories - /etc/docker/daemon.json
+[INFO] 1.12  - Ensure auditing is configured for Docker files and directories - /usr/bin/docker-containerd
+[INFO]      * File not found
+[INFO] 1.13  - Ensure auditing is configured for Docker files and directories - /usr/bin/docker-runc
+[INFO]      * File not found
+
+
+[INFO] 2 - Docker daemon configuration
+[WARN] 2.1  - Ensure network traffic is restricted between containers on the default bridge
+[PASS] 2.2  - Ensure the logging level is set to 'info'
+[PASS] 2.3  - Ensure Docker is allowed to make changes to iptables
+[PASS] 2.4  - Ensure insecure registries are not used
+[PASS] 2.5  - Ensure aufs storage driver is not used
+[INFO] 2.6  - Ensure TLS authentication for Docker daemon is configured
+[INFO]      * Docker daemon not listening on TCP
+[INFO] 2.7  - Ensure the default ulimit is configured appropriately
+[INFO]      * Default ulimit doesn't appear to be set
+[WARN] 2.8  - Enable user namespace support
+[PASS] 2.9  - Ensure the default cgroup usage has been confirmed
+[PASS] 2.10  - Ensure base device size is not changed until needed
+[WARN] 2.11  - Ensure that authorization for Docker client commands is enabled
+[WARN] 2.12  - Ensure centralized and remote logging is configured
+[WARN] 2.13  - Ensure operations on legacy registry (v1) are Disabled
+[PASS] 2.14  - Ensure live restore is Enabled
+[WARN] 2.15  - Ensure Userland Proxy is Disabled
+[PASS] 2.16  - Ensure daemon-wide custom seccomp profile is applied, if needed
+[PASS] 2.17  - Ensure experimental features are avoided in production
+[WARN] 2.18  - Ensure containers are restricted from acquiring new privileges
+
+
+[INFO] 3 - Docker daemon configuration files
+[INFO] 3.1  - Ensure that docker.service file ownership is set to root:root
+[INFO]      * File not found
+[INFO] 3.2  - Ensure that docker.service file permissions are set to 644 or more restrictive
+[INFO]      * File not found
+[INFO] 3.3  - Ensure that docker.socket file ownership is set to root:root
+[INFO]      * File not found
+[INFO] 3.4  - Ensure that docker.socket file permissions are set to 644 or more restrictive
+[INFO]      * File not found
+[PASS] 3.5  - Ensure that /etc/docker directory ownership is set to root:root
+[PASS] 3.6  - Ensure that /etc/docker directory permissions are set to 755 or more restrictive
+[INFO] 3.7  - Ensure that registry certificate file ownership is set to root:root
+[INFO]      * Directory not found
+[INFO] 3.8  - Ensure that registry certificate file permissions are set to 444 or more restrictive
+[INFO]      * Directory not found
+[INFO] 3.9  - Ensure that TLS CA certificate file ownership is set to root:root
+[INFO]      * No TLS CA certificate found
+[INFO] 3.10  - Ensure that TLS CA certificate file permissions are set to 444 or more restrictive
+[INFO]      * No TLS CA certificate found
+[INFO] 3.11  - Ensure that Docker server certificate file ownership is set to root:root
+[INFO]      * No TLS Server certificate found
+[INFO] 3.12  - Ensure that Docker server certificate file permissions are set to 444 or more restrictive
+[INFO]      * No TLS Server certificate found
+[INFO] 3.13  - Ensure that Docker server certificate key file ownership is set to root:root
+[INFO]      * No TLS Key found
+[INFO] 3.14  - Ensure that Docker server certificate key file permissions are set to 400
+[INFO]      * No TLS Key found
+[PASS] 3.15  - Ensure that Docker socket file ownership is set to root:docker
+[PASS] 3.16  - Ensure that Docker socket file permissions are set to 660 or more restrictive
+[PASS] 3.17  - Ensure that daemon.json file ownership is set to root:root
+[PASS] 3.18  - Ensure that daemon.json file permissions are set to 644 or more restrictive
+[INFO] 3.19  - Ensure that /etc/default/docker file ownership is set to root:root
+[INFO]      * File not found
+[INFO] 3.20  - Ensure that /etc/default/docker file permissions are set to 644 or more restrictive
+[INFO]      * File not found
+
+
+[INFO] 4 - Container Images and Build File
+[WARN] 4.1  - Ensure a user for the container has been created
+[WARN]      * Running as root: k8s_POD_kube-proxy-7mttz_kube-system_155317d8-f360-11e9-bcdd-befee94f097c_0
+[WARN]      * Running as root: k8s_POD_metrics-server-58699455bc-glbh6_kube-system_0ec62ceb-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Running as root: k8s_POD_coredns-autoscaler-657d77ffbf-n2q5v_kube-system_118cfb64-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Running as root: k8s_POD_tunnelfront-588fc78b95-tlzw9_kube-system_117eb9ac-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Running as root: k8s_POD_coredns-866fc6b6c8-vpwh7_kube-system_0e72c3bf-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Running as root: k8s_POD_omsagent-wm92m_kube-system_6462bc46-f35f-11e9-a245-86ba04815b14_0
+[WARN]      * Running as root: k8s_POD_omsagent-rs-c496994bf-7dn62_kube-system_0f21b006-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Running as root: k8s_POD_kubernetes-dashboard-6f697bd9f5-k4l76_kube-system_0f7ddbc2-f35f-11e9-9e75-3edda5a89924_0
+[NOTE] 4.2  - Ensure that containers use trusted base images
+[NOTE] 4.3  - Ensure unnecessary packages are not installed in the container
+[NOTE] 4.4  - Ensure images are scanned and rebuilt to include security patches
+[WARN] 4.5  - Ensure Content trust for Docker is Enabled
+[WARN] 4.6  - Ensure HEALTHCHECK instructions have been added to the container image
+[WARN]      * No Healthcheck found: [mcr.microsoft.com/azuremonitor/containerinsights/ciprod:ciprod09262019]
+[WARN]      * No Healthcheck found: [aksrepos.azurecr.io/mirror/hyperkube-amd64:v1.13.11 k8s.gcr.io/hyperkube-amd64:v1.13.11]
+[WARN]      * No Healthcheck found: [aksrepos.azurecr.io/mirror/hyperkube-amd64:v1.13.11 k8s.gcr.io/hyperkube-amd64:v1.13.11]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/cloud-controller-manager-amd64:v1.13.11]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/cluster-autoscaler:v1.16.0]
+[WARN]      * No Healthcheck found: [busybox:latest]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/metrics-server-amd64:v0.3.4]
+[WARN]      * No Healthcheck found: [aksrepos.azurecr.io/prod/hcp-tunnel-front:v1.9.2-v3.0.7]
+[WARN]      * No Healthcheck found: [mcr.microsoft.com/k8s/flexvolume/keyvault-flexvolume:v0.0.13]
+[WARN]      * No Healthcheck found: [gcr.io/google-containers/ip-masq-agent-amd64:v2.5.0 k8s.gcr.io/ip-masq-agent-amd64:v2.5.0]
+[WARN]      * No Healthcheck found: [gcr.io/google-containers/ip-masq-agent-amd64:v2.5.0 k8s.gcr.io/ip-masq-agent-amd64:v2.5.0]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/coredns:1.6.2]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/kube-addon-manager-amd64:v9.0.2]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/cluster-autoscaler:v1.12.7]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/cluster-autoscaler:v1.15.1]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/cluster-autoscaler:v1.14.4]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/cluster-autoscaler:v1.13.6]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/cluster-autoscaler:v1.15.0]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/k8s-dns-kube-dns-amd64:1.15.4]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/k8s-dns-dnsmasq-nanny-amd64:1.15.4]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/addon-resizer:1.8.5]
+[WARN]      * No Healthcheck found: [microsoft/virtual-kubelet:latest]
+[WARN]      * No Healthcheck found: [gcr.io/google-containers/ip-masq-agent-amd64:v2.3.0 k8s.gcr.io/ip-masq-agent-amd64:v2.3.0]
+[WARN]      * No Healthcheck found: [gcr.io/google-containers/ip-masq-agent-amd64:v2.3.0 k8s.gcr.io/ip-masq-agent-amd64:v2.3.0]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/kube-addon-manager-amd64:v8.9.1]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/kube-addon-manager-amd64:v9.0.1]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/cluster-autoscaler:v1.14.2]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/cluster-autoscaler:v1.13.4]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/cluster-autoscaler:v1.12.5]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/cluster-autoscaler:v1.3.9]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/coredns:1.5.0]
+[WARN]      * No Healthcheck found: [mcr.microsoft.com/containernetworking/azure-npm:v1.0.18]
+[WARN]      * No Healthcheck found: [mcr.microsoft.com/containernetworking/networkmonitor:v0.0.6]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/cluster-autoscaler:v1.14.0]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/cluster-autoscaler:v1.13.2]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/cluster-autoscaler:v1.12.3]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/cluster-autoscaler:v1.3.8]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/cluster-autoscaler:v1.2.5]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/cluster-autoscaler:v1.3.7]
+[WARN]      * No Healthcheck found: [mcr.microsoft.com/k8s/flexvolume/blobfuse-flexvolume:1.0.8]
+[WARN]      * No Healthcheck found: [mcr.microsoft.com/k8s/kms/keyvault:v0.0.9]
+[WARN]      * No Healthcheck found: [mcr.microsoft.com/containernetworking/networkmonitor:v0.0.5]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/kube-addon-manager-amd64:v9.0]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/cluster-autoscaler:v1.12.2]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/coredns:1.3.1]
+[WARN]      * No Healthcheck found: [aksrepos.azurecr.io/mirror/kubernetes-dashboard-amd64:v1.10.1 k8s.gcr.io/kubernetes-dashboard-amd64:v1.10.1]
+[WARN]      * No Healthcheck found: [aksrepos.azurecr.io/mirror/kubernetes-dashboard-amd64:v1.10.1 k8s.gcr.io/kubernetes-dashboard-amd64:v1.10.1]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/cluster-autoscaler:v1.13.1]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/k8s-dns-kube-dns-amd64:1.15.0]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/k8s-dns-dnsmasq-nanny-amd64:1.15.0]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/addon-resizer:1.8.4]
+[WARN]      * No Healthcheck found: [aksrepos.azurecr.io/mirror/coredns:1.2.6 k8s.gcr.io/coredns:1.2.6]
+[WARN]      * No Healthcheck found: [aksrepos.azurecr.io/mirror/coredns:1.2.6 k8s.gcr.io/coredns:1.2.6]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/kube-addon-manager-amd64:v8.9]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/cluster-autoscaler:v1.3.4]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/kube-addon-manager-amd64:v8.8]
+[WARN]      * No Healthcheck found: [aksrepos.azurecr.io/mirror/cluster-proportional-autoscaler-amd64:1.3.0]
+[WARN]      * No Healthcheck found: [gcr.io/kubernetes-helm/tiller:v2.11.0]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/cluster-autoscaler:v1.3.3]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/k8s-dns-kube-dns-amd64:1.14.13]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/kube-addon-manager-amd64:v8.7]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/coredns:1.2.2]
+[WARN]      * No Healthcheck found: [deis/kube-svc-redirect:v1.0.2]
+[WARN]      * No Healthcheck found: [nvidia/k8s-device-plugin:1.10]
+[WARN]      * No Healthcheck found: [nvidia/k8s-device-plugin:1.11]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/heapster-amd64:v1.5.4]
+[WARN]      * No Healthcheck found: [deis/hcp-tunnel-front:v1.9.2-v4.0.4]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/rescheduler:v0.4.0]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/cluster-autoscaler:v1.2.2]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/heapster-amd64:v1.5.3]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/k8s-dns-dnsmasq-nanny-amd64:1.14.10]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/k8s-dns-sidecar-amd64:1.14.10]
+[WARN]      * No Healthcheck found: [nginx:1.13.12-alpine]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/kube-addon-manager-amd64:v8.6]
+[WARN]      * No Healthcheck found: [gcr.io/kubernetes-helm/tiller:v2.8.1]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/heapster-amd64:v1.5.1]
+[WARN]      * No Healthcheck found: [quay.io/coreos/flannel:v0.10.0-amd64]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/k8s-dns-dnsmasq-nanny-amd64:1.14.8]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/k8s-dns-sidecar-amd64:1.14.8]
+[WARN]      * No Healthcheck found: [aksrepos.azurecr.io/mirror/pause-amd64:3.1 k8s.gcr.io/pause-amd64:3.1 mcr.microsoft.com/k8s/azurestack/core/pause-amd64:3.1]
+[WARN]      * No Healthcheck found: [aksrepos.azurecr.io/mirror/pause-amd64:3.1 k8s.gcr.io/pause-amd64:3.1 mcr.microsoft.com/k8s/azurestack/core/pause-amd64:3.1]
+[WARN]      * No Healthcheck found: [aksrepos.azurecr.io/mirror/pause-amd64:3.1 k8s.gcr.io/pause-amd64:3.1 mcr.microsoft.com/k8s/azurestack/core/pause-amd64:3.1]
+[WARN]      * No Healthcheck found: [aksrepos.azurecr.io/mirror/metrics-server-amd64:v0.2.1 k8s.gcr.io/metrics-server-amd64:v0.2.1]
+[WARN]      * No Healthcheck found: [aksrepos.azurecr.io/mirror/metrics-server-amd64:v0.2.1 k8s.gcr.io/metrics-server-amd64:v0.2.1]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/addon-resizer:1.8.1]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/k8s-dns-kube-dns-amd64:1.14.5]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/k8s-dns-dnsmasq-nanny-amd64:1.14.5]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/rescheduler:v0.3.1]
+[WARN]      * No Healthcheck found: [quay.io/coreos/flannel:v0.8.0-amd64]
+[WARN]      * No Healthcheck found: [gcr.io/google-containers/ip-masq-agent-amd64:v2.0.0 k8s.gcr.io/ip-masq-agent-amd64:v2.0.0]
+[WARN]      * No Healthcheck found: [gcr.io/google-containers/ip-masq-agent-amd64:v2.0.0 k8s.gcr.io/ip-masq-agent-amd64:v2.0.0]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/addon-resizer:1.7]
+[WARN]      * No Healthcheck found: [k8s.gcr.io/exechealthz-amd64:1.2]
+[INFO] 4.7  - Ensure update instructions are not use alone in the Dockerfile
+[INFO]      * Update instruction found: [mcr.microsoft.com/azuremonitor/containerinsights/ciprod:ciprod09262019]
+[INFO]      * Update instruction found: [aksrepos.azurecr.io/prod/hcp-tunnel-front:v1.9.2-v3.0.7]
+[INFO]      * Update instruction found: [mcr.microsoft.com/containernetworking/networkmonitor:v0.0.6]
+[INFO]      * Update instruction found: [mcr.microsoft.com/containernetworking/networkmonitor:v0.0.5]
+[INFO]      * Update instruction found: [gcr.io/kubernetes-helm/tiller:v2.11.0]
+[INFO]      * Update instruction found: [k8s.gcr.io/kube-addon-manager-amd64:v8.7]
+[INFO]      * Update instruction found: [deis/kube-svc-redirect:v1.0.2]
+[INFO]      * Update instruction found: [deis/hcp-tunnel-front:v1.9.2-v4.0.4]
+[INFO]      * Update instruction found: [k8s.gcr.io/kube-addon-manager-amd64:v8.6]
+[INFO]      * Update instruction found: [gcr.io/kubernetes-helm/tiller:v2.8.1]
+[NOTE] 4.8  - Ensure setuid and setgid permissions are removed in the images
+[INFO] 4.9  - Ensure COPY is used instead of ADD in Dockerfile
+[INFO]      * ADD in image history: [mcr.microsoft.com/azuremonitor/containerinsights/ciprod:ciprod09262019]
+[INFO]      * ADD in image history: [aksrepos.azurecr.io/mirror/hyperkube-amd64:v1.13.11 k8s.gcr.io/hyperkube-amd64:v1.13.11]
+[INFO]      * ADD in image history: [aksrepos.azurecr.io/mirror/hyperkube-amd64:v1.13.11 k8s.gcr.io/hyperkube-amd64:v1.13.11]
+[INFO]      * ADD in image history: [k8s.gcr.io/cloud-controller-manager-amd64:v1.13.11]
+[INFO]      * ADD in image history: [busybox:latest]
+[INFO]      * ADD in image history: [aksrepos.azurecr.io/prod/hcp-tunnel-front:v1.9.2-v3.0.7]
+[INFO]      * ADD in image history: [mcr.microsoft.com/k8s/flexvolume/keyvault-flexvolume:v0.0.13]
+[INFO]      * ADD in image history: [gcr.io/google-containers/ip-masq-agent-amd64:v2.5.0 k8s.gcr.io/ip-masq-agent-amd64:v2.5.0]
+[INFO]      * ADD in image history: [gcr.io/google-containers/ip-masq-agent-amd64:v2.5.0 k8s.gcr.io/ip-masq-agent-amd64:v2.5.0]
+[INFO]      * ADD in image history: [k8s.gcr.io/coredns:1.6.2]
+[INFO]      * ADD in image history: [k8s.gcr.io/kube-addon-manager-amd64:v9.0.2]
+[INFO]      * ADD in image history: [k8s.gcr.io/cluster-autoscaler:v1.12.7]
+[INFO]      * ADD in image history: [k8s.gcr.io/cluster-autoscaler:v1.15.1]
+[INFO]      * ADD in image history: [k8s.gcr.io/cluster-autoscaler:v1.14.4]
+[INFO]      * ADD in image history: [k8s.gcr.io/cluster-autoscaler:v1.13.6]
+[INFO]      * ADD in image history: [k8s.gcr.io/cluster-autoscaler:v1.15.0]
+[INFO]      * ADD in image history: [k8s.gcr.io/k8s-dns-kube-dns-amd64:1.15.4]
+[INFO]      * ADD in image history: [k8s.gcr.io/k8s-dns-dnsmasq-nanny-amd64:1.15.4]
+[INFO]      * ADD in image history: [k8s.gcr.io/addon-resizer:1.8.5]
+[INFO]      * ADD in image history: [gcr.io/google-containers/ip-masq-agent-amd64:v2.3.0 k8s.gcr.io/ip-masq-agent-amd64:v2.3.0]
+[INFO]      * ADD in image history: [gcr.io/google-containers/ip-masq-agent-amd64:v2.3.0 k8s.gcr.io/ip-masq-agent-amd64:v2.3.0]
+[INFO]      * ADD in image history: [k8s.gcr.io/kube-addon-manager-amd64:v8.9.1]
+[INFO]      * ADD in image history: [k8s.gcr.io/kube-addon-manager-amd64:v9.0.1]
+[INFO]      * ADD in image history: [k8s.gcr.io/cluster-autoscaler:v1.14.2]
+[INFO]      * ADD in image history: [k8s.gcr.io/cluster-autoscaler:v1.13.4]
+[INFO]      * ADD in image history: [k8s.gcr.io/cluster-autoscaler:v1.12.5]
+[INFO]      * ADD in image history: [k8s.gcr.io/cluster-autoscaler:v1.3.9]
+[INFO]      * ADD in image history: [k8s.gcr.io/coredns:1.5.0]
+[INFO]      * ADD in image history: [mcr.microsoft.com/containernetworking/azure-npm:v1.0.18]
+[INFO]      * ADD in image history: [mcr.microsoft.com/containernetworking/networkmonitor:v0.0.6]
+[INFO]      * ADD in image history: [k8s.gcr.io/cluster-autoscaler:v1.14.0]
+[INFO]      * ADD in image history: [k8s.gcr.io/cluster-autoscaler:v1.13.2]
+[INFO]      * ADD in image history: [k8s.gcr.io/cluster-autoscaler:v1.12.3]
+[INFO]      * ADD in image history: [k8s.gcr.io/cluster-autoscaler:v1.3.8]
+[INFO]      * ADD in image history: [k8s.gcr.io/cluster-autoscaler:v1.2.5]
+[INFO]      * ADD in image history: [k8s.gcr.io/cluster-autoscaler:v1.3.7]
+[INFO]      * ADD in image history: [mcr.microsoft.com/k8s/flexvolume/blobfuse-flexvolume:1.0.8]
+[INFO]      * ADD in image history: [mcr.microsoft.com/k8s/kms/keyvault:v0.0.9]
+[INFO]      * ADD in image history: [mcr.microsoft.com/containernetworking/networkmonitor:v0.0.5]
+[INFO]      * ADD in image history: [docker/docker-bench-security:latest]
+[INFO]      * ADD in image history: [k8s.gcr.io/kube-addon-manager-amd64:v9.0]
+[INFO]      * ADD in image history: [k8s.gcr.io/cluster-autoscaler:v1.12.2]
+[INFO]      * ADD in image history: [k8s.gcr.io/coredns:1.3.1]
+[INFO]      * ADD in image history: [aksrepos.azurecr.io/mirror/kubernetes-dashboard-amd64:v1.10.1 k8s.gcr.io/kubernetes-dashboard-amd64:v1.10.1]
+[INFO]      * ADD in image history: [aksrepos.azurecr.io/mirror/kubernetes-dashboard-amd64:v1.10.1 k8s.gcr.io/kubernetes-dashboard-amd64:v1.10.1]
+[INFO]      * ADD in image history: [k8s.gcr.io/cluster-autoscaler:v1.13.1]
+[INFO]      * ADD in image history: [k8s.gcr.io/k8s-dns-kube-dns-amd64:1.15.0]
+[INFO]      * ADD in image history: [k8s.gcr.io/k8s-dns-dnsmasq-nanny-amd64:1.15.0]
+[INFO]      * ADD in image history: [k8s.gcr.io/addon-resizer:1.8.4]
+[INFO]      * ADD in image history: [aksrepos.azurecr.io/mirror/coredns:1.2.6 k8s.gcr.io/coredns:1.2.6]
+[INFO]      * ADD in image history: [aksrepos.azurecr.io/mirror/coredns:1.2.6 k8s.gcr.io/coredns:1.2.6]
+[INFO]      * ADD in image history: [k8s.gcr.io/kube-addon-manager-amd64:v8.9]
+[INFO]      * ADD in image history: [k8s.gcr.io/cluster-autoscaler:v1.3.4]
+[INFO]      * ADD in image history: [k8s.gcr.io/kube-addon-manager-amd64:v8.8]
+[INFO]      * ADD in image history: [aksrepos.azurecr.io/mirror/cluster-proportional-autoscaler-amd64:1.3.0]
+[INFO]      * ADD in image history: [gcr.io/kubernetes-helm/tiller:v2.11.0]
+[INFO]      * ADD in image history: [k8s.gcr.io/cluster-autoscaler:v1.3.3]
+[INFO]      * ADD in image history: [k8s.gcr.io/k8s-dns-kube-dns-amd64:1.14.13]
+[INFO]      * ADD in image history: [k8s.gcr.io/kube-addon-manager-amd64:v8.7]
+[INFO]      * ADD in image history: [k8s.gcr.io/coredns:1.2.2]
+[INFO]      * ADD in image history: [deis/kube-svc-redirect:v1.0.2]
+[INFO]      * ADD in image history: [nvidia/k8s-device-plugin:1.10]
+[INFO]      * ADD in image history: [nvidia/k8s-device-plugin:1.11]
+[INFO]      * ADD in image history: [deis/hcp-tunnel-front:v1.9.2-v4.0.4]
+[INFO]      * ADD in image history: [k8s.gcr.io/rescheduler:v0.4.0]
+[INFO]      * ADD in image history: [k8s.gcr.io/cluster-autoscaler:v1.2.2]
+[INFO]      * ADD in image history: [k8s.gcr.io/k8s-dns-dnsmasq-nanny-amd64:1.14.10]
+[INFO]      * ADD in image history: [k8s.gcr.io/k8s-dns-sidecar-amd64:1.14.10]
+[INFO]      * ADD in image history: [nginx:1.13.12-alpine]
+[INFO]      * ADD in image history: [k8s.gcr.io/kube-addon-manager-amd64:v8.6]
+[INFO]      * ADD in image history: [gcr.io/kubernetes-helm/tiller:v2.8.1]
+[INFO]      * ADD in image history: [quay.io/coreos/flannel:v0.10.0-amd64]
+[INFO]      * ADD in image history: [k8s.gcr.io/k8s-dns-dnsmasq-nanny-amd64:1.14.8]
+[INFO]      * ADD in image history: [k8s.gcr.io/k8s-dns-sidecar-amd64:1.14.8]
+[INFO]      * ADD in image history: [aksrepos.azurecr.io/mirror/pause-amd64:3.1 k8s.gcr.io/pause-amd64:3.1 mcr.microsoft.com/k8s/azurestack/core/pause-amd64:3.1]
+[INFO]      * ADD in image history: [aksrepos.azurecr.io/mirror/pause-amd64:3.1 k8s.gcr.io/pause-amd64:3.1 mcr.microsoft.com/k8s/azurestack/core/pause-amd64:3.1]
+[INFO]      * ADD in image history: [aksrepos.azurecr.io/mirror/pause-amd64:3.1 k8s.gcr.io/pause-amd64:3.1 mcr.microsoft.com/k8s/azurestack/core/pause-amd64:3.1]
+[INFO]      * ADD in image history: [aksrepos.azurecr.io/mirror/metrics-server-amd64:v0.2.1 k8s.gcr.io/metrics-server-amd64:v0.2.1]
+[INFO]      * ADD in image history: [aksrepos.azurecr.io/mirror/metrics-server-amd64:v0.2.1 k8s.gcr.io/metrics-server-amd64:v0.2.1]
+[INFO]      * ADD in image history: [k8s.gcr.io/addon-resizer:1.8.1]
+[INFO]      * ADD in image history: [k8s.gcr.io/k8s-dns-kube-dns-amd64:1.14.5]
+[INFO]      * ADD in image history: [k8s.gcr.io/k8s-dns-dnsmasq-nanny-amd64:1.14.5]
+[INFO]      * ADD in image history: [k8s.gcr.io/rescheduler:v0.3.1]
+[INFO]      * ADD in image history: [quay.io/coreos/flannel:v0.8.0-amd64]
+[INFO]      * ADD in image history: [gcr.io/google-containers/ip-masq-agent-amd64:v2.0.0 k8s.gcr.io/ip-masq-agent-amd64:v2.0.0]
+[INFO]      * ADD in image history: [gcr.io/google-containers/ip-masq-agent-amd64:v2.0.0 k8s.gcr.io/ip-masq-agent-amd64:v2.0.0]
+[INFO]      * ADD in image history: [k8s.gcr.io/addon-resizer:1.7]
+[INFO]      * ADD in image history: [k8s.gcr.io/exechealthz-amd64:1.2]
+[NOTE] 4.10  - Ensure secrets are not stored in Dockerfiles
+[NOTE] 4.11  - Ensure verified packages are only Installed
+
+
+[INFO] 5 - Container Runtime
+[PASS] 5.1  - Ensure AppArmor Profile is Enabled
+[WARN] 5.2  - Ensure SELinux security options are set, if applicable
+[WARN]      * No SecurityOptions Found: k8s_autoscaler_coredns-autoscaler-657d77ffbf-n2q5v_kube-system_118cfb64-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * No SecurityOptions Found: k8s_POD_coredns-autoscaler-657d77ffbf-n2q5v_kube-system_118cfb64-f35f-11e9-9e75-3edda5a89924_0
+[PASS] 5.3  - Ensure Linux Kernel Capabilities are restricted within containers
+[WARN] 5.4  - Ensure privileged containers are not used
+[WARN]      * Container running in Privileged mode: k8s_kube-proxy_kube-proxy-7mttz_kube-system_155317d8-f360-11e9-bcdd-befee94f097c_0
+[WARN]      * Container running in Privileged mode: k8s_tunnel-front_tunnelfront-588fc78b95-tlzw9_kube-system_117eb9ac-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Container running in Privileged mode: k8s_omsagent_omsagent-rs-c496994bf-7dn62_kube-system_0f21b006-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Container running in Privileged mode: k8s_omsagent_omsagent-wm92m_kube-system_6462bc46-f35f-11e9-a245-86ba04815b14_0
+[PASS] 5.5  - Ensure sensitive host system directories are not mounted on containers
+[WARN] 5.6  - Ensure ssh is not run within containers
+[WARN]      * Container running sshd: k8s_tunnel-front_tunnelfront-588fc78b95-tlzw9_kube-system_117eb9ac-f35f-11e9-9e75-3edda5a89924_0
+[PASS] 5.7  - Ensure privileged ports are not mapped within containers
+[NOTE] 5.8  - Ensure only needed ports are open on the container
+[WARN] 5.9  - Ensure the host's network namespace is not shared
+[WARN]      * Container running with networking mode 'host': k8s_POD_kube-proxy-7mttz_kube-system_155317d8-f360-11e9-bcdd-befee94f097c_0
+[WARN] 5.10  - Ensure memory usage for container is limited
+[WARN]      * Container running without memory restrictions: k8s_kube-proxy_kube-proxy-7mttz_kube-system_155317d8-f360-11e9-bcdd-befee94f097c_0
+[WARN]      * Container running without memory restrictions: k8s_POD_kube-proxy-7mttz_kube-system_155317d8-f360-11e9-bcdd-befee94f097c_0
+[WARN]      * Container running without memory restrictions: k8s_metrics-server_metrics-server-58699455bc-glbh6_kube-system_0ec62ceb-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Container running without memory restrictions: k8s_autoscaler_coredns-autoscaler-657d77ffbf-n2q5v_kube-system_118cfb64-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Container running without memory restrictions: k8s_tunnel-front_tunnelfront-588fc78b95-tlzw9_kube-system_117eb9ac-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Container running without memory restrictions: k8s_POD_metrics-server-58699455bc-glbh6_kube-system_0ec62ceb-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Container running without memory restrictions: k8s_POD_coredns-autoscaler-657d77ffbf-n2q5v_kube-system_118cfb64-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Container running without memory restrictions: k8s_POD_tunnelfront-588fc78b95-tlzw9_kube-system_117eb9ac-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Container running without memory restrictions: k8s_POD_coredns-866fc6b6c8-vpwh7_kube-system_0e72c3bf-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Container running without memory restrictions: k8s_POD_omsagent-wm92m_kube-system_6462bc46-f35f-11e9-a245-86ba04815b14_0
+[WARN]      * Container running without memory restrictions: k8s_POD_omsagent-rs-c496994bf-7dn62_kube-system_0f21b006-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Container running without memory restrictions: k8s_POD_kubernetes-dashboard-6f697bd9f5-k4l76_kube-system_0f7ddbc2-f35f-11e9-9e75-3edda5a89924_0
+[PASS] 5.11  - Ensure CPU priority is set appropriately on the container
+[WARN] 5.12  - Ensure the container's root filesystem is mounted as read only
+[WARN]      * Container running with root FS mounted R/W: k8s_kube-proxy_kube-proxy-7mttz_kube-system_155317d8-f360-11e9-bcdd-befee94f097c_0
+[WARN]      * Container running with root FS mounted R/W: k8s_POD_kube-proxy-7mttz_kube-system_155317d8-f360-11e9-bcdd-befee94f097c_0
+[WARN]      * Container running with root FS mounted R/W: k8s_metrics-server_metrics-server-58699455bc-glbh6_kube-system_0ec62ceb-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Container running with root FS mounted R/W: k8s_autoscaler_coredns-autoscaler-657d77ffbf-n2q5v_kube-system_118cfb64-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Container running with root FS mounted R/W: k8s_tunnel-front_tunnelfront-588fc78b95-tlzw9_kube-system_117eb9ac-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Container running with root FS mounted R/W: k8s_main_kubernetes-dashboard-6f697bd9f5-k4l76_kube-system_0f7ddbc2-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Container running with root FS mounted R/W: k8s_omsagent_omsagent-rs-c496994bf-7dn62_kube-system_0f21b006-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Container running with root FS mounted R/W: k8s_omsagent_omsagent-wm92m_kube-system_6462bc46-f35f-11e9-a245-86ba04815b14_0
+[WARN]      * Container running with root FS mounted R/W: k8s_POD_metrics-server-58699455bc-glbh6_kube-system_0ec62ceb-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Container running with root FS mounted R/W: k8s_POD_coredns-autoscaler-657d77ffbf-n2q5v_kube-system_118cfb64-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Container running with root FS mounted R/W: k8s_POD_tunnelfront-588fc78b95-tlzw9_kube-system_117eb9ac-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Container running with root FS mounted R/W: k8s_POD_coredns-866fc6b6c8-vpwh7_kube-system_0e72c3bf-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Container running with root FS mounted R/W: k8s_POD_omsagent-wm92m_kube-system_6462bc46-f35f-11e9-a245-86ba04815b14_0
+[WARN]      * Container running with root FS mounted R/W: k8s_POD_omsagent-rs-c496994bf-7dn62_kube-system_0f21b006-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Container running with root FS mounted R/W: k8s_POD_kubernetes-dashboard-6f697bd9f5-k4l76_kube-system_0f7ddbc2-f35f-11e9-9e75-3edda5a89924_0
+[PASS] 5.13  - Ensure incoming container traffic is binded to a specific host interface
+[WARN] 5.14  - Ensure 'on-failure' container restart policy is set to '5'
+[WARN]      * MaximumRetryCount is not set to 5: k8s_kube-proxy_kube-proxy-7mttz_kube-system_155317d8-f360-11e9-bcdd-befee94f097c_0
+[WARN]      * MaximumRetryCount is not set to 5: k8s_POD_kube-proxy-7mttz_kube-system_155317d8-f360-11e9-bcdd-befee94f097c_0
+[WARN]      * MaximumRetryCount is not set to 5: k8s_metrics-server_metrics-server-58699455bc-glbh6_kube-system_0ec62ceb-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * MaximumRetryCount is not set to 5: k8s_autoscaler_coredns-autoscaler-657d77ffbf-n2q5v_kube-system_118cfb64-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * MaximumRetryCount is not set to 5: k8s_tunnel-front_tunnelfront-588fc78b95-tlzw9_kube-system_117eb9ac-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * MaximumRetryCount is not set to 5: k8s_main_kubernetes-dashboard-6f697bd9f5-k4l76_kube-system_0f7ddbc2-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * MaximumRetryCount is not set to 5: k8s_omsagent_omsagent-rs-c496994bf-7dn62_kube-system_0f21b006-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * MaximumRetryCount is not set to 5: k8s_omsagent_omsagent-wm92m_kube-system_6462bc46-f35f-11e9-a245-86ba04815b14_0
+[WARN]      * MaximumRetryCount is not set to 5: k8s_coredns_coredns-866fc6b6c8-vpwh7_kube-system_0e72c3bf-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * MaximumRetryCount is not set to 5: k8s_POD_metrics-server-58699455bc-glbh6_kube-system_0ec62ceb-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * MaximumRetryCount is not set to 5: k8s_POD_coredns-autoscaler-657d77ffbf-n2q5v_kube-system_118cfb64-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * MaximumRetryCount is not set to 5: k8s_POD_tunnelfront-588fc78b95-tlzw9_kube-system_117eb9ac-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * MaximumRetryCount is not set to 5: k8s_POD_coredns-866fc6b6c8-vpwh7_kube-system_0e72c3bf-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * MaximumRetryCount is not set to 5: k8s_POD_omsagent-wm92m_kube-system_6462bc46-f35f-11e9-a245-86ba04815b14_0
+[WARN]      * MaximumRetryCount is not set to 5: k8s_POD_omsagent-rs-c496994bf-7dn62_kube-system_0f21b006-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * MaximumRetryCount is not set to 5: k8s_POD_kubernetes-dashboard-6f697bd9f5-k4l76_kube-system_0f7ddbc2-f35f-11e9-9e75-3edda5a89924_0
+[PASS] 5.15  - Ensure the host's process namespace is not shared
+[PASS] 5.16  - Ensure the host's IPC namespace is not shared
+[PASS] 5.17  - Ensure host devices are not directly exposed to containers
+[INFO] 5.18  - Ensure the default ulimit is overwritten at runtime, only if needed
+[INFO]      * Container no default ulimit override: k8s_kube-proxy_kube-proxy-7mttz_kube-system_155317d8-f360-11e9-bcdd-befee94f097c_0
+[INFO]      * Container no default ulimit override: k8s_POD_kube-proxy-7mttz_kube-system_155317d8-f360-11e9-bcdd-befee94f097c_0
+[INFO]      * Container no default ulimit override: k8s_metrics-server_metrics-server-58699455bc-glbh6_kube-system_0ec62ceb-f35f-11e9-9e75-3edda5a89924_0
+[INFO]      * Container no default ulimit override: k8s_autoscaler_coredns-autoscaler-657d77ffbf-n2q5v_kube-system_118cfb64-f35f-11e9-9e75-3edda5a89924_0
+[INFO]      * Container no default ulimit override: k8s_tunnel-front_tunnelfront-588fc78b95-tlzw9_kube-system_117eb9ac-f35f-11e9-9e75-3edda5a89924_0
+[INFO]      * Container no default ulimit override: k8s_main_kubernetes-dashboard-6f697bd9f5-k4l76_kube-system_0f7ddbc2-f35f-11e9-9e75-3edda5a89924_0
+[INFO]      * Container no default ulimit override: k8s_omsagent_omsagent-rs-c496994bf-7dn62_kube-system_0f21b006-f35f-11e9-9e75-3edda5a89924_0
+[INFO]      * Container no default ulimit override: k8s_omsagent_omsagent-wm92m_kube-system_6462bc46-f35f-11e9-a245-86ba04815b14_0
+[INFO]      * Container no default ulimit override: k8s_coredns_coredns-866fc6b6c8-vpwh7_kube-system_0e72c3bf-f35f-11e9-9e75-3edda5a89924_0
+[INFO]      * Container no default ulimit override: k8s_POD_metrics-server-58699455bc-glbh6_kube-system_0ec62ceb-f35f-11e9-9e75-3edda5a89924_0
+[INFO]      * Container no default ulimit override: k8s_POD_coredns-autoscaler-657d77ffbf-n2q5v_kube-system_118cfb64-f35f-11e9-9e75-3edda5a89924_0
+[INFO]      * Container no default ulimit override: k8s_POD_tunnelfront-588fc78b95-tlzw9_kube-system_117eb9ac-f35f-11e9-9e75-3edda5a89924_0
+[INFO]      * Container no default ulimit override: k8s_POD_coredns-866fc6b6c8-vpwh7_kube-system_0e72c3bf-f35f-11e9-9e75-3edda5a89924_0
+[INFO]      * Container no default ulimit override: k8s_POD_omsagent-wm92m_kube-system_6462bc46-f35f-11e9-a245-86ba04815b14_0
+[INFO]      * Container no default ulimit override: k8s_POD_omsagent-rs-c496994bf-7dn62_kube-system_0f21b006-f35f-11e9-9e75-3edda5a89924_0
+[INFO]      * Container no default ulimit override: k8s_POD_kubernetes-dashboard-6f697bd9f5-k4l76_kube-system_0f7ddbc2-f35f-11e9-9e75-3edda5a89924_0
+[PASS] 5.19  - Ensure mount propagation mode is not set to shared
+[WARN] 5.20  - Ensure the host's UTS namespace is not shared
+[WARN]      * Host UTS namespace being shared with: k8s_kube-proxy_kube-proxy-7mttz_kube-system_155317d8-f360-11e9-bcdd-befee94f097c_0
+[WARN] 5.21  - Ensure the default seccomp profile is not Disabled
+[WARN]      * Default seccomp profile disabled: k8s_kube-proxy_kube-proxy-7mttz_kube-system_155317d8-f360-11e9-bcdd-befee94f097c_0
+[WARN]      * Default seccomp profile disabled: k8s_POD_kube-proxy-7mttz_kube-system_155317d8-f360-11e9-bcdd-befee94f097c_0
+[WARN]      * Default seccomp profile disabled: k8s_metrics-server_metrics-server-58699455bc-glbh6_kube-system_0ec62ceb-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Default seccomp profile disabled: k8s_tunnel-front_tunnelfront-588fc78b95-tlzw9_kube-system_117eb9ac-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Default seccomp profile disabled: k8s_main_kubernetes-dashboard-6f697bd9f5-k4l76_kube-system_0f7ddbc2-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Default seccomp profile disabled: k8s_omsagent_omsagent-rs-c496994bf-7dn62_kube-system_0f21b006-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Default seccomp profile disabled: k8s_omsagent_omsagent-wm92m_kube-system_6462bc46-f35f-11e9-a245-86ba04815b14_0
+[WARN]      * Default seccomp profile disabled: k8s_coredns_coredns-866fc6b6c8-vpwh7_kube-system_0e72c3bf-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Default seccomp profile disabled: k8s_POD_metrics-server-58699455bc-glbh6_kube-system_0ec62ceb-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Default seccomp profile disabled: k8s_POD_tunnelfront-588fc78b95-tlzw9_kube-system_117eb9ac-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Default seccomp profile disabled: k8s_POD_coredns-866fc6b6c8-vpwh7_kube-system_0e72c3bf-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Default seccomp profile disabled: k8s_POD_omsagent-wm92m_kube-system_6462bc46-f35f-11e9-a245-86ba04815b14_0
+[WARN]      * Default seccomp profile disabled: k8s_POD_omsagent-rs-c496994bf-7dn62_kube-system_0f21b006-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Default seccomp profile disabled: k8s_POD_kubernetes-dashboard-6f697bd9f5-k4l76_kube-system_0f7ddbc2-f35f-11e9-9e75-3edda5a89924_0
+[NOTE] 5.22  - Ensure docker exec commands are not used with privileged option
+[NOTE] 5.23  - Ensure docker exec commands are not used with user option
+[WARN] 5.24  - Ensure cgroup usage is confirmed
+[WARN]      * Confirm cgroup usage: k8s_kube-proxy_kube-proxy-7mttz_kube-system_155317d8-f360-11e9-bcdd-befee94f097c_0
+[WARN]      * Confirm cgroup usage: k8s_POD_kube-proxy-7mttz_kube-system_155317d8-f360-11e9-bcdd-befee94f097c_0
+[WARN]      * Confirm cgroup usage: k8s_metrics-server_metrics-server-58699455bc-glbh6_kube-system_0ec62ceb-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Confirm cgroup usage: k8s_autoscaler_coredns-autoscaler-657d77ffbf-n2q5v_kube-system_118cfb64-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Confirm cgroup usage: k8s_tunnel-front_tunnelfront-588fc78b95-tlzw9_kube-system_117eb9ac-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Confirm cgroup usage: k8s_main_kubernetes-dashboard-6f697bd9f5-k4l76_kube-system_0f7ddbc2-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Confirm cgroup usage: k8s_omsagent_omsagent-rs-c496994bf-7dn62_kube-system_0f21b006-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Confirm cgroup usage: k8s_omsagent_omsagent-wm92m_kube-system_6462bc46-f35f-11e9-a245-86ba04815b14_0
+[WARN]      * Confirm cgroup usage: k8s_coredns_coredns-866fc6b6c8-vpwh7_kube-system_0e72c3bf-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Confirm cgroup usage: k8s_POD_metrics-server-58699455bc-glbh6_kube-system_0ec62ceb-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Confirm cgroup usage: k8s_POD_coredns-autoscaler-657d77ffbf-n2q5v_kube-system_118cfb64-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Confirm cgroup usage: k8s_POD_tunnelfront-588fc78b95-tlzw9_kube-system_117eb9ac-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Confirm cgroup usage: k8s_POD_coredns-866fc6b6c8-vpwh7_kube-system_0e72c3bf-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Confirm cgroup usage: k8s_POD_omsagent-wm92m_kube-system_6462bc46-f35f-11e9-a245-86ba04815b14_0
+[WARN]      * Confirm cgroup usage: k8s_POD_omsagent-rs-c496994bf-7dn62_kube-system_0f21b006-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Confirm cgroup usage: k8s_POD_kubernetes-dashboard-6f697bd9f5-k4l76_kube-system_0f7ddbc2-f35f-11e9-9e75-3edda5a89924_0
+[WARN] 5.25  - Ensure the container is restricted from acquiring additional privileges
+[WARN]      * Privileges not restricted: k8s_kube-proxy_kube-proxy-7mttz_kube-system_155317d8-f360-11e9-bcdd-befee94f097c_0
+[WARN]      * Privileges not restricted: k8s_POD_kube-proxy-7mttz_kube-system_155317d8-f360-11e9-bcdd-befee94f097c_0
+[WARN]      * Privileges not restricted: k8s_metrics-server_metrics-server-58699455bc-glbh6_kube-system_0ec62ceb-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Privileges not restricted: k8s_autoscaler_coredns-autoscaler-657d77ffbf-n2q5v_kube-system_118cfb64-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Privileges not restricted: k8s_tunnel-front_tunnelfront-588fc78b95-tlzw9_kube-system_117eb9ac-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Privileges not restricted: k8s_main_kubernetes-dashboard-6f697bd9f5-k4l76_kube-system_0f7ddbc2-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Privileges not restricted: k8s_omsagent_omsagent-rs-c496994bf-7dn62_kube-system_0f21b006-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Privileges not restricted: k8s_omsagent_omsagent-wm92m_kube-system_6462bc46-f35f-11e9-a245-86ba04815b14_0
+[WARN]      * Privileges not restricted: k8s_POD_metrics-server-58699455bc-glbh6_kube-system_0ec62ceb-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Privileges not restricted: k8s_POD_coredns-autoscaler-657d77ffbf-n2q5v_kube-system_118cfb64-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Privileges not restricted: k8s_POD_tunnelfront-588fc78b95-tlzw9_kube-system_117eb9ac-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Privileges not restricted: k8s_POD_coredns-866fc6b6c8-vpwh7_kube-system_0e72c3bf-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Privileges not restricted: k8s_POD_omsagent-wm92m_kube-system_6462bc46-f35f-11e9-a245-86ba04815b14_0
+[WARN]      * Privileges not restricted: k8s_POD_omsagent-rs-c496994bf-7dn62_kube-system_0f21b006-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Privileges not restricted: k8s_POD_kubernetes-dashboard-6f697bd9f5-k4l76_kube-system_0f7ddbc2-f35f-11e9-9e75-3edda5a89924_0
+[WARN] 5.26  - Ensure container health is checked at runtime
+[WARN]      * Health check not set: k8s_kube-proxy_kube-proxy-7mttz_kube-system_155317d8-f360-11e9-bcdd-befee94f097c_0
+[WARN]      * Health check not set: k8s_POD_kube-proxy-7mttz_kube-system_155317d8-f360-11e9-bcdd-befee94f097c_0
+[WARN]      * Health check not set: k8s_metrics-server_metrics-server-58699455bc-glbh6_kube-system_0ec62ceb-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Health check not set: k8s_autoscaler_coredns-autoscaler-657d77ffbf-n2q5v_kube-system_118cfb64-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Health check not set: k8s_tunnel-front_tunnelfront-588fc78b95-tlzw9_kube-system_117eb9ac-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Health check not set: k8s_main_kubernetes-dashboard-6f697bd9f5-k4l76_kube-system_0f7ddbc2-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Health check not set: k8s_omsagent_omsagent-rs-c496994bf-7dn62_kube-system_0f21b006-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Health check not set: k8s_omsagent_omsagent-wm92m_kube-system_6462bc46-f35f-11e9-a245-86ba04815b14_0
+[WARN]      * Health check not set: k8s_coredns_coredns-866fc6b6c8-vpwh7_kube-system_0e72c3bf-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Health check not set: k8s_POD_metrics-server-58699455bc-glbh6_kube-system_0ec62ceb-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Health check not set: k8s_POD_coredns-autoscaler-657d77ffbf-n2q5v_kube-system_118cfb64-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Health check not set: k8s_POD_tunnelfront-588fc78b95-tlzw9_kube-system_117eb9ac-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Health check not set: k8s_POD_coredns-866fc6b6c8-vpwh7_kube-system_0e72c3bf-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Health check not set: k8s_POD_omsagent-wm92m_kube-system_6462bc46-f35f-11e9-a245-86ba04815b14_0
+[WARN]      * Health check not set: k8s_POD_omsagent-rs-c496994bf-7dn62_kube-system_0f21b006-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * Health check not set: k8s_POD_kubernetes-dashboard-6f697bd9f5-k4l76_kube-system_0f7ddbc2-f35f-11e9-9e75-3edda5a89924_0
+[INFO] 5.27  - Ensure docker commands always get the latest version of the image
+[WARN] 5.28  - Ensure PIDs cgroup limit is used
+[WARN]      * PIDs limit not set: k8s_kube-proxy_kube-proxy-7mttz_kube-system_155317d8-f360-11e9-bcdd-befee94f097c_0
+[WARN]      * PIDs limit not set: k8s_POD_kube-proxy-7mttz_kube-system_155317d8-f360-11e9-bcdd-befee94f097c_0
+[WARN]      * PIDs limit not set: k8s_metrics-server_metrics-server-58699455bc-glbh6_kube-system_0ec62ceb-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * PIDs limit not set: k8s_autoscaler_coredns-autoscaler-657d77ffbf-n2q5v_kube-system_118cfb64-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * PIDs limit not set: k8s_tunnel-front_tunnelfront-588fc78b95-tlzw9_kube-system_117eb9ac-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * PIDs limit not set: k8s_main_kubernetes-dashboard-6f697bd9f5-k4l76_kube-system_0f7ddbc2-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * PIDs limit not set: k8s_omsagent_omsagent-rs-c496994bf-7dn62_kube-system_0f21b006-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * PIDs limit not set: k8s_omsagent_omsagent-wm92m_kube-system_6462bc46-f35f-11e9-a245-86ba04815b14_0
+[WARN]      * PIDs limit not set: k8s_coredns_coredns-866fc6b6c8-vpwh7_kube-system_0e72c3bf-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * PIDs limit not set: k8s_POD_metrics-server-58699455bc-glbh6_kube-system_0ec62ceb-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * PIDs limit not set: k8s_POD_coredns-autoscaler-657d77ffbf-n2q5v_kube-system_118cfb64-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * PIDs limit not set: k8s_POD_tunnelfront-588fc78b95-tlzw9_kube-system_117eb9ac-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * PIDs limit not set: k8s_POD_coredns-866fc6b6c8-vpwh7_kube-system_0e72c3bf-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * PIDs limit not set: k8s_POD_omsagent-wm92m_kube-system_6462bc46-f35f-11e9-a245-86ba04815b14_0
+[WARN]      * PIDs limit not set: k8s_POD_omsagent-rs-c496994bf-7dn62_kube-system_0f21b006-f35f-11e9-9e75-3edda5a89924_0
+[WARN]      * PIDs limit not set: k8s_POD_kubernetes-dashboard-6f697bd9f5-k4l76_kube-system_0f7ddbc2-f35f-11e9-9e75-3edda5a89924_0
+[PASS] 5.29  - Ensure Docker's default bridge docker0 is not used
+[PASS] 5.30  - Ensure the host's user namespaces is not shared
+[PASS] 5.31  - Ensure the Docker socket is not mounted inside any containers
+
+
+[INFO] 6 - Docker Security Operations
+[INFO] 6.1  - Avoid image sprawl
+[INFO]      * There are currently: 85 images
+[INFO]      * Only 17 out of 85 are in use
+[INFO] 6.2  - Avoid container sprawl
+[INFO]      * There are currently a total of 17 containers, with 17 of them currently running
+
+
+[INFO] 7 - Docker Swarm Configuration
+[PASS] 7.1  - Ensure swarm mode is not Enabled, if not needed
+[PASS] 7.2  - Ensure the minimum number of manager nodes have been created in a swarm (Swarm mode not enabled)
+[PASS] 7.3  - Ensure swarm services are binded to a specific host interface (Swarm mode not enabled)
+[PASS] 7.4  - Ensure data exchanged between containers are encrypted on different nodes on the overlay network
+[PASS] 7.5  - Ensure Docker's secret management commands are used for managing secrets in a Swarm cluster (Swarm mode not enabled)
+[PASS] 7.6  - Ensure swarm manager is run in auto-lock mode (Swarm mode not enabled)
+[PASS] 7.7  - Ensure swarm manager auto-lock key is rotated periodically (Swarm mode not enabled)
+[PASS] 7.8  - Ensure node certificates are rotated as appropriate (Swarm mode not enabled)
+[PASS] 7.9  - Ensure CA certificates are rotated as appropriate (Swarm mode not enabled)
+[PASS] 7.10  - Ensure management plane traffic has been separated from data plane traffic (Swarm mode not enabled)
+
+[INFO] Checks: 105
+[INFO] Score: 10

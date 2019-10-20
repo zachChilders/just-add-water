@@ -189,7 +189,7 @@ $k8sReqs = @(
         Name     = "Deploy Security Policy"
         Describe = "Security Policy deployment"
         Set      = {
-            kubectl apply -f $OutputDir/security.yml
+            kubectl apply -f $OutputDir/sec2.yml
         }
     }
 )
