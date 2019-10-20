@@ -1,5 +1,5 @@
 $ErrorActionPreference = "Stop"
-
+# $PSScriptRoot = "~/dev/just-add-water"
 $RepoRoot = $PSScriptRoot
 $OutputDir = "$PSScriptRoot/out"
 
@@ -137,7 +137,7 @@ $k8sReqs = @(
 
             $service_data = @{
                 "service_name" = "pegasus"
-                "port"         = 80 # This needs to enforce 443 - See issue #41
+                "port"         = 80   # This needs to enforce 443 - See issue #41
             }
             Expand-Template -Template $service_template -Data $service_data | Out-File $OutputDir/pod.yml -Append
         }
@@ -170,6 +170,19 @@ $k8sReqs = @(
 
             # Apply default policy
             az aks update --resource-group sbd --name sbd --enable-pod-security-policy
+
+            $security_template = (Get-Content ./templates/k8s/security.yml | Join-String -Separator "`n")
+            $template_data = @{
+                "service_name" = "sec2"
+            }
+            Expand-Template -Template $security_template -Data $template_data | Out-File $OutputDir/sec2.yml -Append
+        }
+    },
+    @{
+        Name     = "Deploy Security Policy"
+        Describe = "Security Policy deployment"
+        Set      = {
+            kubectl apply -f $OutputDir/security.yml
         }
     }
 )
