@@ -33,6 +33,14 @@ function Expand-Template {
 
 <#
 .SYNOPSIS
+  Generates a list of container names for later usage.
+#>
+function Get-ContainerNames {
+  Get-ChildItem -Path $AppPath -Filter "*dockerfile*" -Recurse
+}
+
+<#
+.SYNOPSIS
   Generates a config JSON based on contents of an /app folder.
 .NOTES
   Searches for dockerfiles and saves information about them for later use.
@@ -45,8 +53,7 @@ function Set-k8sConfig {
   )
   # parse each Dockerfile in to a K8S JSON
   # we only check for top level dockerfiles right now.
-  Get-ChildItem -Path $AppPath -Filter "*dockerfile*" -Recurse `
-  | % {
+  Get-ContainerNames | % {
     # Full File Name
     $Name = $_.FullName
     # Parent Directory
@@ -56,7 +63,12 @@ function Set-k8sConfig {
     # Query inactive container for config
     $Config = docker inspect mics233.azurecr.io/$ImageName --format="{{json .Config}}"
     # Extract port numbers out of config
-    $Ports = ($Config | ConvertFrom-Json -AsHashtable).ExposedPorts.Keys | % { ($_ -split "/")[0] }
+    if (-not [string]::IsNullOrEmpty($Config)) {
+      $Ports = ($Config | ConvertFrom-Json -AsHashtable).ExposedPorts.Keys | % { ($_ -split "/")[0] }
+    }
+    else {
+      $Ports = 80
+    }
 
     # Build a model for serialization
     [Docker] @{
