@@ -4,16 +4,12 @@
     "name": "PowerShell",
     "dockerFile": "Dockerfile",
     // Uncomment the next line to use a non-root user. See https://aka.ms/vscode-remote/containers/non-root-user.
-    // "runArgs": [ "-u", "1000" ],
     "runArgs": [
         "-v",
         "/var/run/docker.sock:/var/run/docker.sock",
-        // "-v",
-        // "${env:HOME}${env:USERPROFILE}/.ssh:/root/.ssh:ro",
         "-u",
         "1000"
     ],
-    // "postCreateCommand": "mkdir -p ~/.ssh && cp -r ~/.ssh/* ~/.ssh && chmod 700 ~/.ssh && chmod 600 ~/.ssh/*",
     "extensions": [
         "ms-vscode.powershell",
         "mauve.terraform",
