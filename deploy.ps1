@@ -10,12 +10,7 @@ $acr_name = "mics233.azurecr.io"
 
 Import-Module -Name "./modules/jaw"
 
-"Requirements" | % {
-    if (-not (Get-InstalledModule  $_)) {
-        Install-Module $_ -Force
-    }
-    Import-Module $_
-}
+"Requirements" | % { Import-Module $_ }
 
 # Auth Azure and gather subscription secrets
 $azureReqs = @(
@@ -45,11 +40,16 @@ $azureReqs = @(
 # Provision Infra
 $tfReqs = @(
     @{
+        Name     = "Set Terraform Location"
+        Describe = "Enter Terraform Context"
+        Test     = { (Get-Location).Path -eq "$RepoRoot/tf"}
+        Set      = { Set-Location "$RepoRoot/tf"}
+    }
+    @{
         Name     = "Terraform init"
         Describe = "Initialize terraform environment"
         Test     = { Test-Path "$PSScriptRoot/tf/.terraform/terraform.tfstate" }
         Set      = {
-            Set-Location -Path "tf"
             terraform init -backend-config="storage_account_name=$($tf_share)" `
                 -backend-config="container_name=tfstate" `
                 -backend-config="access_key=$($env:terraform_storage_key)" `
@@ -65,18 +65,26 @@ $tfReqs = @(
         Test     = { Test-Path "$OutputDir/out.plan" }
         Set      = {
             New-Item -Path "$OutputDir" -ItemType Directory -Force
-            terraform plan -out "$OutputDir/out.plan"
+            terraform plan -out "$OutputDir/out.plan" -refresh=true
         }
     },
     @{
         Name     = "Terraform Apply"
         Describe = "Apply Terraform plan"
+        Test     = { [boolean] (terraform output host) }
+        Set      = { terraform apply "$OutputDir/out.plan" }
+    },
+    @{
+        Name     = "Generate K8s Connection"
+        Describe = "Generate k8s File"
         Test     = { Test-Path "$OutputDir/azurek8s" }
-        Set      = {
-            terraform apply "$OutputDir/out.plan" | Write-Information
-            terraform output kube_config | Out-File "$OutputDir/azurek8s"
-            Set-Location $RepoRoot
-        }
+        Set      = { terraform output kube_config | Out-File "$OutputDir/azurek8s" }
+    },
+    @{
+        Name     = "Restore Repo Directory"
+        Describe = "Restore Location"
+        Test     = { (Get-Location).Path -eq $RepoRoot }
+        Set      = { Set-Location $RepoRoot }
     }
 )
 
@@ -94,9 +102,9 @@ $dockerReqs = @(
         }
     },
     @{
-        Name     = "Build Docker Containers"
-        Describe = "Build all containers"
-        Set      = {
+        Name      = "Build Docker Containers"
+        Describe  = "Build all containers"
+        Set       = {
             $list = Get-Content ./out/k8s.json | ConvertFrom-Json
             $list | % { docker build -t "$acr_name/$($_.ImageName)" -f $_.Name $_.Path }
         }
@@ -105,7 +113,7 @@ $dockerReqs = @(
         Name     = "Push Containers"
         Describe = "Push all containers"
         Set      = {
-            docker login $acr_name -u mics233 -p $env:acrpassword
+            docker login $acr_name -u mics233 -p $env:acrpassword | Out-Null
 
             $list = Get-Content ./out/k8s.json | ConvertFrom-Json
             $list | % { docker push "$acr_name/$($_.ImageName)" }
@@ -164,6 +172,14 @@ $k8sReqs = @(
     #         kubectl autoscale deployment pegasus --min=2 --max=5 --cpu-percent=80
     #     }
     # },
+    @{
+        Name     = "Apply Patching"
+        Describe = "Deploy kured"
+        Test     = { [boolean] (kubectl describe nodes | grep kured) }
+        Set      = {
+            kubectl apply -f https://github.com/weaveworks/kured/releases/download/1.2.0/kured-1.2.0-dockerhub.yaml
+        }
+    },
     @{
         Name     = "Harden Cluster"
         Describe = "Apply security policy"
