@@ -10,7 +10,10 @@ $acr_name = "mics233.azurecr.io"
 
 Import-Module -Name "./modules/jaw"
 
-"Requirements" | % { Import-Module $_ }
+"Requirements" | % {
+    Install-Module -Name $_ -Force
+    Import-Module -Name $_
+}
 
 # Auth Azure and gather subscription secrets
 $azureReqs = @(
@@ -42,15 +45,14 @@ $tfReqs = @(
     @{
         Name     = "Set Terraform Location"
         Describe = "Enter Terraform Context"
-        Test     = { (Get-Location).Path -eq "$RepoRoot/tf"}
-        Set      = { Set-Location "$RepoRoot/tf"}
-    }
+        Test     = { (Get-Location).Path -eq "$RepoRoot/tf/enclave" }
+        Set      = { Set-Location "$RepoRoot/tf/enclave" }
+    },
     @{
         Name     = "Terraform init"
         Describe = "Initialize terraform environment"
         Test     = { Test-Path "$PSScriptRoot/tf/enclave/.terraform/terraform.tfstate" }
         Set      = {
-            Set-Location -Path "tf/enclave"
             terraform init -backend-config="storage_account_name=$($tf_share)" `
                 -backend-config="container_name=tfstate" `
                 -backend-config="access_key=$($env:terraform_storage_key)" `
@@ -104,9 +106,9 @@ $dockerReqs = @(
         }
     },
     @{
-        Name      = "Build Docker Containers"
-        Describe  = "Build all containers"
-        Set       = {
+        Name     = "Build Docker Containers"
+        Describe = "Build all containers"
+        Set      = {
             $list = Get-Content ./out/k8s.json | ConvertFrom-Json
             $list | % { docker build -t "$acr_name/$($_.ImageName)" -f $_.Name $_.Path }
         }

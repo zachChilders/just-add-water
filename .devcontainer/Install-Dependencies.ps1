@@ -2,10 +2,8 @@ $ErrorActionPreference = "STOP"
 
 # Bootstrap Requirements
 
-"Requirements" | % {
-    Install-Module -Name $_ -Force
-    Import-Module -Name $_
-}
+Install-Module Requirements
+Import-Module Requirements
 
 $azurecli = @(
     @{
