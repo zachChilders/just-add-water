@@ -156,18 +156,18 @@ $k8sReqs = @(
             kubectl apply -f $OutputDir/pod.yml
         }
     },
-    @{
-        Name     = "Set autoscale"
-        Describe = "Configure Autoscale"
-        Test     = { kubectl get hpa }
-        Set      = {
-            kubectl autoscale deployment pegasus --min=2 --max=5 --cpu-percent=80
-        }
-    },
+    # @{
+    #     Name     = "Set autoscale"
+    #     Describe = "Configure Autoscale"
+    #     Test     = { kubectl get hpa }
+    #     Set      = {
+    #         kubectl autoscale deployment pegasus --min=2 --max=5 --cpu-percent=80
+    #     }
+    # },
     @{
         Name     = "Harden Cluster"
         Describe = "Apply security policy"
-        Test     = { kubectl get psp } # Improve tests
+        # Test     = { kubectl get psp } # Improve tests
         Set      = {
             # Install the aks-preview extension
             az extension add --name aks-preview
@@ -194,7 +194,7 @@ $k8sReqs = @(
     }
 )
 
-$azureReqs | Invoke-Requirement | Format-Checklist
-$tfReqs | Invoke-Requirement | Format-Checklist
-$dockerReqs | Invoke-Requirement | Format-Checklist
+#$azureReqs | Invoke-Requirement | Format-Checklist
+#$tfReqs | Invoke-Requirement | Format-Checklist
+#$dockerReqs | Invoke-Requirement | Format-Checklist
 $k8sReqs | Invoke-Requirement | Format-Checklist
