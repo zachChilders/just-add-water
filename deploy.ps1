@@ -42,38 +42,6 @@ $azureReqs = @(
     }
 )
 
-# Detect global infra
-$globalReqs = @(
-    @{
-        Name     = "Terraform init"
-        Describe = "Initialize terraform environment"
-        Test     = { Test-Path "$PSScriptRoot/tf/global/.terraform/terraform.tfstate" }
-        Set      = {
-            Set-Location -Path "tf/global"
-            terraform init
-        }
-    },
-    @{
-        Name     = "Terraform plan"
-        Describe = "Plan terraform environment"
-        Test     = { Test-Path "$OutputDir/global.plan" }
-        Set      = {
-            New-Item -Path "$OutputDir" -ItemType Directory -Force
-            terraform plan -out "$OutputDir/global.plan"
-        }
-    },
-    @{
-        Name     = "Terraform Apply"
-        Describe = "Apply Terraform plan"
-        Test     = { Test-Path "$OutputDir/global" }
-        Set      = {
-            terraform apply "$OutputDir/out.plan" | Write-Information
-            terraform output kube_config | Out-File "$OutputDir/azurek8s"
-            Set-Location $RepoRoot
-        }
-    }
-)
-
 # Provision Infra
 $tfReqs = @(
     @{
@@ -214,7 +182,6 @@ $k8sReqs = @(
     }
 )
 
-$globalReqs | Invoke-Requirement | Format-Checklist
 $azureReqs | Invoke-Requirement | Format-Checklist
 $tfReqs | Invoke-Requirement | Format-Checklist
 $dockerReqs | Invoke-Requirement | Format-Checklist

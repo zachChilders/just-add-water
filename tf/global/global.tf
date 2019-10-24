@@ -1,3 +1,10 @@
+resource "random_id" "server" {
+  keepers = {
+    azi_id = 1
+  }
+  byte_length = 6
+}
+
 resource "azurerm_resource_group" "global-rg" {
   name     = "sbd-global"
   location = "South Central US"
@@ -18,7 +25,7 @@ resource "azurerm_key_vault" "global-kv" {
   }
 }
 
-resource "azurerm_key_vault_access_policy" "test" {
+resource "azurerm_key_vault_access_policy" "policy" {
   key_vault_id = azurerm_key_vault.global-kv.id
 
   tenant_id = "e86183dc-d7cc-4132-8b39-a8de37272433"
@@ -26,6 +33,7 @@ resource "azurerm_key_vault_access_policy" "test" {
 
   secret_permissions = [
     "get",
+    "list",
     "set",
   ]
 }
@@ -59,3 +67,23 @@ resource "azurerm_storage_account" "global-logstore" {
   account_replication_type = "LRS"
 }
 
+resource "azurerm_traffic_manager_profile" "global-atm" {
+  name                = "sbd-atm"
+  resource_group_name = "${azurerm_resource_group.global-rg.name}"
+
+  traffic_routing_method = "Weighted"
+
+  dns_config {
+    relative_name = "${random_id.server.hex}"
+    ttl           = 100
+  }
+
+  monitor_config {
+    protocol                     = "http"
+    port                         = 80
+    path                         = "/"
+    interval_in_seconds          = 30
+    timeout_in_seconds           = 9
+    tolerated_number_of_failures = 3
+  }
+}
