@@ -56,7 +56,7 @@ $globalReqs = @(
         Name     = "Generate Config"
         Describe = "Generate Global Config File"
         Test     = { Test-Path "$OutputDir/global" }
-        Set      = { 
+        Set      = {
             terraform refresh
             terraform output | Out-File "$OutputDir/global" }
     },
@@ -68,5 +68,38 @@ $globalReqs = @(
     }
 )
 
-$azureReqs | Invoke-Requirement | Format-Checklist
-$globalReqs | Invoke-Requirement | Format-Checklist
+$persistReqs = @(
+    @{
+        Name     = "Load Config"
+        Describe = "Load State Config"
+        Set      = {
+            Get-Content $OutputDir/global | % {
+                $varline = $_ -split " = "
+                [Environment]::SetEnvironmentVariable($varline[0], $varline[1])
+            }
+
+            $env:AZURE_STORAGE_ACCOUNT = "sbdtfstorage"
+            $env:AZURE_STORAGE_KEY = $env:tf_storage_key
+        }
+    },
+    @{
+        Name     = "Create State Container"
+        Describe = "Create State Container"
+        Test     = { (az storage container exists --name tfstate | ConvertFrom-Json).exists }
+        Set      = {
+            az storage container create --name tfstate
+        }
+    },
+    @{
+        Name     = "Upload State"
+        Describe = "Upload State"
+        Test     = { (az storage blob exists --container-name tfstate --name terraform.tfstate | ConvertFrom-Json).exists }
+        Set      = {
+            az storage blob upload --container-name tfstate --name terraform.tfstate --file $RepoRoot/tf/global/terraform.tfstate
+        }
+    }
+)
+
+$azureReqs   | Invoke-Requirement | Format-Checklist
+$globalReqs  | Invoke-Requirement | Format-Checklist
+$persistReqs | Invoke-Requirement | Format-Checklist
