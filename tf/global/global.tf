@@ -1,3 +1,10 @@
+resource "random_id" "server" {
+  keepers = {
+    azi_id = 1
+  }
+  byte_length = 6
+}
+
 resource "azurerm_resource_group" "global-rg" {
   name     = "sbd-global"
   location = "South Central US"
@@ -79,4 +86,18 @@ resource "azurerm_traffic_manager_profile" "global-atm" {
     timeout_in_seconds           = 9
     tolerated_number_of_failures = 3
   }
+}
+
+resource "azurerm_azuread_application" "sbd-aad" {
+  name                       = "sbd"
+  homepage                   = "https://sbd"
+  identifier_uris            = ["https://sbd"]
+  reply_urls                 = ["https://replysbd"]
+  available_to_other_tenants = false
+  oauth2_allow_implicit_flow = true
+}
+
+
+resource "azurerm_azuread_service_principal" "sbd-sp" {
+  application_id = "${azurerm_azuread_application.sbd-aad.application_id}"
 }
