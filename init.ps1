@@ -79,7 +79,7 @@ $persistReqs = @(
             }
 
             $env:AZURE_STORAGE_ACCOUNT = "sbdtfstorage"
-            $env:AZURE_STORAGE_KEY = $env:tf_storage_key
+            $env:AZURE_STORAGE_KEY = $env:TF_storage_key
         }
     },
     @{
@@ -100,6 +100,18 @@ $persistReqs = @(
     }
 )
 
-$azureReqs   | Invoke-Requirement | Format-Checklist
-$globalReqs  | Invoke-Requirement | Format-Checklist
-$persistReqs | Invoke-Requirement | Format-Checklist
+# $azureReqs   | Invoke-Requirement | Format-Checklist
+# $globalReqs  | Invoke-Requirement | Format-Checklist
+# $persistReqs | Invoke-Requirement | Format-Checklist
+
+# Set secrets
+"TF-sql-user", "TF-sql-password" `
+| % {
+  New-Variable -Name "secretname" -Value $_ -Scope "local" -Force
+  @{
+    Describe = "Secret '$secretname' exists"
+    Set      = {
+        az keyvault secret set --name $secretname --vault-name $env:kv_name --value ([guid]::newguid()).Guid
+    }
+   } | Invoke-Requirement | Format-Checklist
+}

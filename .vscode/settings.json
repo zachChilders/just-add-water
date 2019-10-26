@@ -1,5 +1,6 @@
 {
     "editor.formatOnSave": true,
+    "docker.showRemoteWorkspaceWarning": true,
     "files.autoGuessEncoding": true,
     "powershell.debugging.createTemporaryIntegratedConsole": true,
     "powershell.enableProfileLoading": false,

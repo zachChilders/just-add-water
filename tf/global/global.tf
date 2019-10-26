@@ -19,10 +19,11 @@ resource "azurerm_key_vault" "global-kv" {
 
   sku_name = "premium"
 
-  network_acls {
-    default_action = "Deny"
-    bypass         = "AzureServices"
-  }
+  # We should apply these ACLs anywhere we possibly can.
+  # network_acls {
+  #   default_action = "Deny"
+  #   bypass         = "AzureServices"
+  # }
 }
 
 resource "azurerm_key_vault_access_policy" "policy" {
