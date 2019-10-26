@@ -1,5 +1,5 @@
 $ErrorActionPreference = "Stop"
-# $PSScriptRoot = "~/dev/just-add-water"
+
 $RepoRoot = $PSScriptRoot
 $OutputDir = "$PSScriptRoot/out"
 
@@ -164,14 +164,14 @@ $k8sReqs = @(
             kubectl apply -f $OutputDir/pod.yml
         }
     },
-    # @{
-    #     Name     = "Set autoscale"
-    #     Describe = "Configure Autoscale"
-    #     Test     = { kubectl get hpa }
-    #     Set      = {
-    #         kubectl autoscale deployment pegasus --min=2 --max=5 --cpu-percent=80
-    #     }
-    # },
+    @{
+        Name     = "Set autoscale"
+        Describe = "Configure Autoscale"
+        Test     = { kubectl get hpa }
+        Set      = {
+            kubectl autoscale deployment pegasus --min=2 --max=5 --cpu-percent=80
+        }
+    },
     @{
         Name     = "Apply Patching"
         Describe = "Deploy kured"
