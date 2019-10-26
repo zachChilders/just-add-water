@@ -180,37 +180,37 @@ $k8sReqs = @(
             kubectl apply -f https://github.com/weaveworks/kured/releases/download/1.2.0/kured-1.2.0-dockerhub.yaml
         }
     },
-    @{
-        Name     = "Harden Cluster"
-        Describe = "Apply security policy"
-        # Test     = { kubectl get psp } # Improve tests
-        Set      = {
-            # Install the aks-preview extension
-            az extension add --name aks-preview
+    # @{
+    #     Name     = "Harden Cluster"
+    #     Describe = "Apply security policy"
+    #     # Test     = { kubectl get psp } # Improve tests
+    #     Set      = {
+    #         # Install the aks-preview extension
+    #         az extension add --name aks-preview
 
-            # Update the extension to make sure you have the latest version installed
-            az extension update --name aks-preview
+    #         # Update the extension to make sure you have the latest version installed
+    #         az extension update --name aks-preview
 
-            # Apply default policy
-            az aks update --resource-group sbd --name sbd --enable-pod-security-policy
+    #         # Apply default policy
+    #         az aks update --resource-group sbd --name sbd --enable-pod-security-policy
 
-            $security_template = (Get-Content ./templates/k8s/security.yml | Join-String -Separator "`n")
-            $template_data = @{
-                "service_name" = "sec2"
-            }
-            Expand-Template -Template $security_template -Data $template_data | Out-File $OutputDir/sec2.yml -Append
-        }
-    },
-    @{
-        Name     = "Deploy Security Policy"
-        Describe = "Security Policy deployment"
-        Set      = {
-            kubectl apply -f $OutputDir/sec2.yml
-        }
-    }
+    #         $security_template = (Get-Content ./templates/k8s/security.yml | Join-String -Separator "`n")
+    #         $template_data = @{
+    #             "service_name" = "sec2"
+    #         }
+    #         Expand-Template -Template $security_template -Data $template_data | Out-File $OutputDir/sec2.yml -Append
+    #     }
+    # },
+    # @{
+    #     Name     = "Deploy Security Policy"
+    #     Describe = "Security Policy deployment"
+    #     Set      = {
+    #         kubectl apply -f $OutputDir/sec2.yml
+    #     }
+    # }
 )
 
-#$azureReqs | Invoke-Requirement | Format-Checklist
-#$tfReqs | Invoke-Requirement | Format-Checklist
-#$dockerReqs | Invoke-Requirement | Format-Checklist
+$azureReqs | Invoke-Requirement | Format-Checklist
+$tfReqs | Invoke-Requirement | Format-Checklist
+$dockerReqs | Invoke-Requirement | Format-Checklist
 $k8sReqs | Invoke-Requirement | Format-Checklist
