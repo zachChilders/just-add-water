@@ -10,7 +10,6 @@ Import-Module -Name "./modules/jaw"
     Import-Module -Name $_
 }
 
-
 # Auth Azure and gather subscription secrets
 $azureReqs = @(
     @{
@@ -100,18 +99,45 @@ $persistReqs = @(
     }
 )
 
-# $azureReqs   | Invoke-Requirement | Format-Checklist
-# $globalReqs  | Invoke-Requirement | Format-Checklist
-# $persistReqs | Invoke-Requirement | Format-Checklist
+$azureReqs | Invoke-Requirement | Format-Checklist
+$globalReqs | Invoke-Requirement | Format-Checklist
+$persistReqs | Invoke-Requirement | Format-Checklist
 
 # Set secrets
 "TF-sql-user", "TF-sql-password" `
 | % {
-  New-Variable -Name "secretname" -Value $_ -Scope "local" -Force
-  @{
-    Describe = "Secret '$secretname' exists"
-    Set      = {
-        az keyvault secret set --name $secretname --vault-name $env:kv_name --value ([guid]::newguid()).Guid
-    }
-   } | Invoke-Requirement | Format-Checklist
+    # This is an ugly hack because powershell doesn't have closures
+    New-Variable -Name "secretname" -Value $_ -Scope "local" -Force
+    @{
+        Describe = "Secret '$secretname' exists"
+        Set      = {
+            az keyvault secret set --name $secretname --vault-name $env:kv_name --value ([guid]::newguid()).Guid
+        }
+    } | Invoke-Requirement | Format-Checklist
 }
+
+# Set SSH keys
+@(
+    @{
+        Describe = "Generate SSH Keys"
+        Test     = { (Test-Path ./key) -and (Test-Path ./key.pub) }
+        Set      = {
+            ssh-keygen -t rsa -b 4096 -N '""' -f key
+        }
+    },
+    @{
+        Describe = "Upload SSH Keys"
+        Set      = {
+            az keyvault secret set --name ssh-private-key --vault-name $env:kv_name --value $(Get-Content ./key -Raw)
+            az keyvault secret set --name ssh-public-key --vault-name $env:kv_name --value $(Get-Content ./key.pub -Raw)
+        }
+    },
+    @{
+        Describe = "Clean up Keys"
+        Test     = { -not (Test-Path ./key) -and -not (Test-Path ./key.pub) }
+        Set      = {
+            rm ./key
+            rm ./key.pub
+        }
+    }
+) | Invoke-Requirement | Format-Checklist

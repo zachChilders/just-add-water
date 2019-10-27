@@ -44,7 +44,7 @@ resource "azurerm_container_registry" "global-acr" {
   resource_group_name = azurerm_resource_group.global-rg.name
   location            = azurerm_resource_group.global-rg.location
   sku                 = "Premium"
-  admin_enabled       = false
+  admin_enabled       = true
 }
 
 resource "azurerm_dns_zone" "global-dns" {
@@ -75,7 +75,7 @@ resource "azurerm_traffic_manager_profile" "global-atm" {
   traffic_routing_method = "Weighted"
 
   dns_config {
-    relative_name = "${random_id.server.hex}"
+    relative_name = "sbd"
     ttl           = 100
   }
 
@@ -89,16 +89,15 @@ resource "azurerm_traffic_manager_profile" "global-atm" {
   }
 }
 
-resource "azurerm_azuread_application" "sbd-aad" {
-  name                       = "sbd"
-  homepage                   = "https://sbd"
-  identifier_uris            = ["https://sbd"]
-  reply_urls                 = ["https://replysbd"]
-  available_to_other_tenants = false
-  oauth2_allow_implicit_flow = true
-}
+# resource "azurerm_azuread_application" "sbd-aad" {
+#   name                       = "sbd"
+#   homepage                   = "https://sbd"
+#   identifier_uris            = ["https://sbd"]
+#   reply_urls                 = ["https://replysbd"]
+#   available_to_other_tenants = false
+#   oauth2_allow_implicit_flow = true
+# }
 
-
-resource "azurerm_azuread_service_principal" "sbd-sp" {
-  application_id = "${azurerm_azuread_application.sbd-aad.application_id}"
-}
+# resource "azurerm_azuread_service_principal" "sbd-sp" {
+#   application_id = "${azurerm_azuread_application.sbd-aad.application_id}"
+# }
