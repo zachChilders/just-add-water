@@ -1,7 +1,3 @@
-[submodule "app/magento"]
-	path = app/magento
-	url = https://github.com/mics-sbd/magento.git
-
 [submodule "app/wordpress"]
 	path = app/wordpress
 	url = https://github.com/mics-sbd/wordpress.git
