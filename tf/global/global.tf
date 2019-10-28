@@ -1,10 +1,3 @@
-resource "random_id" "server" {
-  keepers = {
-    azi_id = 1
-  }
-  byte_length = 6
-}
-
 resource "azurerm_resource_group" "global-rg" {
   name     = "sbd-global"
   location = "South Central US"
@@ -15,7 +8,8 @@ resource "azurerm_key_vault" "global-kv" {
   location                    = azurerm_resource_group.global-rg.location
   resource_group_name         = azurerm_resource_group.global-rg.name
   enabled_for_disk_encryption = true
-  tenant_id                   = "e86183dc-d7cc-4132-8b39-a8de37272433"
+  #tenant_id                   = "e86183dc-d7cc-4132-8b39-a8de37272433"
+  tenant_id                   = "${var.tenantId}"
 
   sku_name = "premium"
 
@@ -29,8 +23,10 @@ resource "azurerm_key_vault" "global-kv" {
 resource "azurerm_key_vault_access_policy" "policy" {
   key_vault_id = azurerm_key_vault.global-kv.id
 
-  tenant_id = "e86183dc-d7cc-4132-8b39-a8de37272433"
-  object_id = "fb27f79f-4a67-452c-ba1e-55ed2a1b29a6"
+  #tenant_id = "e86183dc-d7cc-4132-8b39-a8de37272433"
+  tenant_id = "${var.tenantId}"
+  #object_id = "fb27f79f-4a67-452c-ba1e-55ed2a1b29a6"
+  object_id = "${var.groupId}"
 
   secret_permissions = [
     "get",
@@ -88,16 +84,3 @@ resource "azurerm_traffic_manager_profile" "global-atm" {
     tolerated_number_of_failures = 3
   }
 }
-
-# resource "azurerm_azuread_application" "sbd-aad" {
-#   name                       = "sbd"
-#   homepage                   = "https://sbd"
-#   identifier_uris            = ["https://sbd"]
-#   reply_urls                 = ["https://replysbd"]
-#   available_to_other_tenants = false
-#   oauth2_allow_implicit_flow = true
-# }
-
-# resource "azurerm_azuread_service_principal" "sbd-sp" {
-#   application_id = "${azurerm_azuread_application.sbd-aad.application_id}"
-# }

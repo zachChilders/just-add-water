@@ -3,10 +3,9 @@ $ErrorActionPreference = "Stop"
 $RepoRoot = $PSScriptRoot
 $OutputDir = "$PSScriptRoot/out"
 
-# TODO: Set these better
-$tf_share = "zachterraformstorage"
-$kv_name = "mics-kv"
-$acr_name = "mics233.azurecr.io"
+$tf_share = "sbdtfstorage"
+$kv_name = "sbdvault"
+$acr_name = "sbdacrglobal.azurecr.io"
 
 Import-Module -Name "./modules/jaw"
 
@@ -23,9 +22,7 @@ $azureReqs = @(
         Test     = { [boolean] (az account show) }
         Set      = { az login }
     },
-    @{  # This could be done idempotently with a test,
-        # but refreshing the secrets every run allows for
-        # new secrets to be added easily
+    @{
         Name     = "Keyvault Secrets"
         Describe = "Inject Secrets into Session"
         Set      = {
@@ -55,7 +52,7 @@ $tfReqs = @(
         Set      = {
             terraform init -backend-config="storage_account_name=$($tf_share)" `
                 -backend-config="container_name=tfstate" `
-                -backend-config="access_key=$($env:terraform_storage_key)" `
+                -backend-config="access_key=$($env:tf_storage_key)" `
                 -backend-config="key=mics.tfstate"
 
             # Ensure state is synchronized across deployments with production

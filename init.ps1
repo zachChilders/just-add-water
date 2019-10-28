@@ -2,6 +2,7 @@ $ErrorActionPreference = "Stop"
 
 $RepoRoot = $PSScriptRoot
 $OutputDir = "$PSScriptRoot/out"
+New-Item $OutputDir -ItemType Directory -Force | Out-Null
 
 Import-Module -Name "./modules/jaw"
 
@@ -17,8 +18,53 @@ $azureReqs = @(
         Describe = "Authenticate Azure Session"
         Test     = { [boolean] (az account show) }
         Set      = { az login }
+    },
+    @{
+        Name     = "Export Tenant Info"
+        Describe = "Exporting Tenant Information"
+        Set      = {
+            $az = az account show | ConvertFrom-Json
+            $env:TF_VAR_tenantId = $az.tenantId
+        }
+    },
+    @{
+        Describe = "Create Service Principal"
+        Test     = {
+            $sp = (az ad sp list --all) | ConvertFrom-Json
+            "http://sbdsp" -in $sp.servicePrincipalNames
+        }
+        Set      = {
+            $sp = (az ad sp create-for-rbac --name http://sbdsp) | ConvertFrom-Json
+            $env:TF_VAR_client_id = $sp.appId
+            $env:TF_VAR_client_secret = $sp.password
+        }
+    },
+    @{
+        Describe = "Create User Group"
+        Test     = {
+            $azg = (az ad group list) | ConvertFrom-Json
+            "sbdadmin" -in $azg.displayName
+        }
+        Set      = {
+            $azg = (az ad group create --display-name sbdadmin --mail-nickname admins) | ConvertFrom-Json
+            $env:TF_VAR_groupId = $azg.objectId
+        }
+    },
+    @{
+        Describe = "Add Self to Group"
+        Test     = {
+            $memberId = (az ad signed-in-user show | ConvertFrom-Json).objectId
+            $groupMembers = (az ad group member list --group sbdadmin | ConvertFrom-Json).objectId
+            $memberId -in $groupMembers
+        }
+        Set = {
+            $memberId = (az ad signed-in-user show | ConvertFrom-Json).objectid
+            az ad group member add --group sbdadmin --member $memberId
+        }
     }
 )
+
+### Generating Secrets ###
 
 # Detect global infra
 $globalReqs = @(
@@ -57,7 +103,9 @@ $globalReqs = @(
         Test     = { Test-Path "$OutputDir/global" }
         Set      = {
             terraform refresh
-            terraform output | Out-File "$OutputDir/global" }
+            terraform output | Out-File "$OutputDir/global"
+            $env:kv_name = (terraform output kv-name)
+        }
     },
     @{
         Name     = "Restore Repo Directory"
@@ -86,7 +134,7 @@ $persistReqs = @(
         Describe = "Create State Container"
         Test     = { (az storage container exists --name tfstate | ConvertFrom-Json).exists }
         Set      = {
-            az storage container create --name tfstate
+            az storage container create --name tfstate | Out-Null
         }
     },
     @{
@@ -94,7 +142,7 @@ $persistReqs = @(
         Describe = "Upload State"
         Test     = { (az storage blob exists --container-name tfstate --name terraform.tfstate | ConvertFrom-Json).exists }
         Set      = {
-            az storage blob upload --container-name tfstate --name terraform.tfstate --file $RepoRoot/tf/global/terraform.tfstate
+            az storage blob upload --container-name tfstate --name terraform.tfstate --file $RepoRoot/tf/global/terraform.tfstate | Out-Null
         }
     }
 )
@@ -103,15 +151,43 @@ $azureReqs | Invoke-Requirement | Format-Checklist
 $globalReqs | Invoke-Requirement | Format-Checklist
 $persistReqs | Invoke-Requirement | Format-Checklist
 
-# Set secrets
-"TF-sql-user", "TF-sql-password" `
+# Set terraform secrets
+Get-Content $OutputDir/global `
 | % {
-    # This is an ugly hack because powershell doesn't have closures
+    $secret = $_ -split " = "
+    $secretname = $secret[0]
+    $secretvalue = $secret[1]
+    New-Variable -Name "secretname" -Value $secretname -Scope "local" -Force
+    New-Variable -Name "secretval" -Value $secretvalue -Scope "local" -Force
+    @{
+        Describe = "Global Secret '$secretname' exists"
+        Set      = {
+            az keyvault secret set --name $secretname --vault-name $env:kv_name --value $secretvalue
+        }
+    } | Invoke-Requirement | Format-Checklist
+}
+
+# Set environment secrets
+"TF_VAR_client_id", "TF_VAR_client_id" `
+| % {
     New-Variable -Name "secretname" -Value $_ -Scope "local" -Force
+    New-Variable -Name $_ -Value ([Environment]::GetEnvironmentVariable($_)) -Scope "local" -Force
     @{
         Describe = "Secret '$secretname' exists"
         Set      = {
-            az keyvault secret set --name $secretname --vault-name $env:kv_name --value ([guid]::newguid()).Guid
+            az keyvault secret set --name $secretname.Replace("_", "-") --vault-name $env:kv_name --value "$([Environment]::GetEnvironmentVariable($secretname))"
+        }
+    } | Invoke-Requirement | Format-Checklist
+}
+
+# Set random secrets
+"TF-VAR-sql-user", "TF-VAR-sql-password" `
+| % {
+    New-Variable -Name "secretname" -Value $_ -Scope "local" -Force
+    @{
+        Describe = "Randomized Secret '$secretname' exists"
+        Set      = {
+            az keyvault secret set --name $secretname --vault-name $env:kv_name --value ([guid]::newguid()).Guid.Remove("-")
         }
     } | Invoke-Requirement | Format-Checklist
 }
@@ -120,24 +196,24 @@ $persistReqs | Invoke-Requirement | Format-Checklist
 @(
     @{
         Describe = "Generate SSH Keys"
-        Test     = { (Test-Path ./key) -and (Test-Path ./key.pub) }
+        Test     = { (Test-Path $OutputDir/key) -and (Test-Path $OutputDir/key.pub) }
         Set      = {
-            ssh-keygen -t rsa -b 4096 -N '""' -f key
+            ssh-keygen -t rsa -b 4096 -N '""' -f $OutputDir/key
         }
     },
     @{
-        Describe = "Upload SSH Keys"
+        Describe = "SSH Keys Exist"
         Set      = {
-            az keyvault secret set --name ssh-private-key --vault-name $env:kv_name --value $(Get-Content ./key -Raw)
-            az keyvault secret set --name ssh-public-key --vault-name $env:kv_name --value $(Get-Content ./key.pub -Raw)
+            az keyvault secret set --name TF-VAR-ssh-private-key --vault-name $env:kv_name --value $(Get-Content $OutputDir/key -Raw)
+            az keyvault secret set --name TF-VAR-ssh-public-key --vault-name $env:kv_name --value $(Get-Content $OutputDir/key.pub -Raw)
         }
     },
     @{
         Describe = "Clean up Keys"
-        Test     = { -not (Test-Path ./key) -and -not (Test-Path ./key.pub) }
+        Test     = { -not (Test-Path $OutputDir/key) -and -not (Test-Path $OutputDir/key.pub) }
         Set      = {
-            rm ./key
-            rm ./key.pub
+            rm $OutputDir/key
+            rm $OutputDir/key.pub
         }
     }
 ) | Invoke-Requirement | Format-Checklist
