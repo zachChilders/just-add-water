@@ -187,7 +187,7 @@ Get-Content $OutputDir/global `
     @{
         Describe = "Randomized Secret '$secretname' exists"
         Set      = {
-            az keyvault secret set --name $secretname --vault-name $env:kv_name --value ([guid]::newguid()).Guid.Remove("-")
+            az keyvault secret set --name $secretname --vault-name $env:kv_name --value ([guid]::newguid().Guid).replace("-","").substring(0,14)
         }
     } | Invoke-Requirement | Format-Checklist
 }
