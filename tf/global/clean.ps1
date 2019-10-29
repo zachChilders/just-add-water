@@ -21,4 +21,4 @@ rm terraform.tfstate.backup
 # Delete just-add-water files
 rm ../../out/global
 rm ../../out/global.plan
-cd ../..
+Set-Location ../..
