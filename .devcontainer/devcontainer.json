@@ -3,12 +3,9 @@
 {
     "name": "PowerShell",
     "dockerFile": "Dockerfile",
-    // Uncomment the next line to use a non-root user. See https://aka.ms/vscode-remote/containers/non-root-user.
     "runArgs": [
         "-v",
-        "/var/run/docker.sock:/var/run/docker.sock",
-        "-u",
-        "1000"
+        "/var/run/docker.sock:/var/run/docker.sock"
     ],
     "extensions": [
         "ms-vscode.powershell",

@@ -1,0 +1,3 @@
+variable groupId {}
+
+variable tenantId {}
