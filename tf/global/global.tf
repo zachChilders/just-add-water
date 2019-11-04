@@ -9,7 +9,7 @@ resource "azurerm_key_vault" "global-kv" {
   resource_group_name         = azurerm_resource_group.global-rg.name
   enabled_for_disk_encryption = true
   #tenant_id                   = "e86183dc-d7cc-4132-8b39-a8de37272433"
-  tenant_id                   = "${var.tenantId}"
+  tenant_id = "${var.tenantId}"
 
   sku_name = "premium"
 
@@ -49,19 +49,24 @@ resource "azurerm_dns_zone" "global-dns" {
 }
 
 resource "azurerm_storage_account" "global-tfstore" {
-  name                     = "sbdtfstorage"
-  resource_group_name      = azurerm_resource_group.global-rg.name
-  location                 = azurerm_resource_group.global-rg.location
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
+  name                      = "sbdtfstorage"
+  resource_group_name       = azurerm_resource_group.global-rg.name
+  location                  = azurerm_resource_group.global-rg.location
+  account_tier              = "Standard"
+  account_replication_type  = "LRS"
+  enable_https_traffic_only = true
+  enable_blob_encryption    = true
 }
 
 resource "azurerm_storage_account" "global-logstore" {
-  name                     = "sbdlogstorage"
-  resource_group_name      = azurerm_resource_group.global-rg.name
-  location                 = azurerm_resource_group.global-rg.location
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
+  name                      = "sbdlogstorage"
+  resource_group_name       = azurerm_resource_group.global-rg.name
+  location                  = azurerm_resource_group.global-rg.location
+  account_tier              = "Standard"
+  account_replication_type  = "LRS"
+  enable_https_traffic_only = true
+  enable_blob_encryption    = true
+
 }
 
 resource "azurerm_traffic_manager_profile" "global-atm" {
