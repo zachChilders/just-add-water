@@ -17,13 +17,11 @@ Import-Module -Name "./modules/jaw"
 # Auth Azure and gather subscription secrets
 $azureReqs = @(
     @{
-        Name     = "Azure Login"
         Describe = "Authenticate Azure Session"
         Test     = { [boolean] (az account show) }
         Set      = { az login }
     },
     @{
-        Name     = "Keyvault Secrets"
         Describe = "Inject Secrets into Session"
         Set      = {
             $KEYVAULTNAME = $kv_name
@@ -40,14 +38,12 @@ $azureReqs = @(
 # Provision Infra
 $tfReqs = @(
     @{
-        Name     = "Set Terraform Location"
         Describe = "Enter Terraform Context"
         Test     = { (Get-Location).Path -eq "$RepoRoot/tf/enclave" }
         Set      = { Set-Location "$RepoRoot/tf/enclave" }
     },
     @{
-        Name     = "Terraform init"
-        Describe = "Initialize terraform environment"
+        Describe = "Initialize Terraform Environment"
         Test     = { Test-Path "$PSScriptRoot/tf/enclave/.terraform/terraform.tfstate" }
         Set      = {
             terraform init -backend-config="storage_account_name=$($tf_share)" `
@@ -60,7 +56,6 @@ $tfReqs = @(
         }
     },
     @{
-        Name     = "Terraform plan"
         Describe = "Plan terraform environment"
         Test     = { Test-Path "$OutputDir/out.plan" }
         Set      = {
@@ -69,19 +64,16 @@ $tfReqs = @(
         }
     },
     @{
-        Name     = "Terraform Apply"
         Describe = "Apply Terraform plan"
         Test     = { [boolean] (terraform output host) }
         Set      = { terraform apply "$OutputDir/out.plan" }
     },
     @{
-        Name     = "Generate K8s Connection"
         Describe = "Generate k8s File"
         Test     = { Test-Path "$OutputDir/azurek8s" }
         Set      = { terraform output kube_config | Out-File "$OutputDir/azurek8s" }
     },
     @{
-        Name     = "Restore Repo Directory"
         Describe = "Restore Location"
         Test     = { (Get-Location).Path -eq $RepoRoot }
         Set      = { Set-Location $RepoRoot }
@@ -91,19 +83,17 @@ $tfReqs = @(
 # Docker cooking
 $dockerReqs = @(
     @{
-        Name     = "Generate Config File"
         Describe = "Generate JSON"
         Set      = {
-            $DockerImages = az acr repository list -n mics233 -o json | ConvertFrom-Json
+            $DockerImages = az acr repository list -n sbdacrglobal -o json | ConvertFrom-Json
             Get-ContainerNames | % {
                 $ImageName = $_.ImageName
-                if ($ImageName -in $DockerImages) { docker pull mics233.azurecr.io/$ImageName }
+                if ($ImageName -in $DockerImages) { docker pull $env:acr_login_server/$ImageName }
             }
             Set-k8sConfig -AppPath "./app" -OutPath "./out"
         }
     },
     @{
-        Name     = "Build Docker Containers"
         Describe = "Build all containers"
         Set      = {
             $list = Get-Content ./out/k8s.json | ConvertFrom-Json
@@ -111,10 +101,9 @@ $dockerReqs = @(
         }
     },
     @{
-        Name     = "Push Containers"
         Describe = "Push all containers"
         Set      = {
-            docker login $acr_name -u mics233 -p $env:acrpassword | Out-Null
+            docker login $acr_name -u $env:acr_admin -p $env:acr_password | Out-Null
 
             $list = Get-Content ./out/k8s.json | ConvertFrom-Json
             $list | % { docker push "$acr_name/$($_.ImageName)" }
@@ -125,14 +114,12 @@ $dockerReqs = @(
 # Kubernetes Deployment
 $k8sReqs = @(
     @{
-        Name     = "Load Config"
         Describe = "Load k8s config"
         Set      = {
             $env:KUBECONFIG = "./out/azurek8s"
         }
     },
     @{
-        Name     = "Generate pod.yml"
         Describe = "Generate pod.yml"
         Test     = { Test-Path $OutputDir/pod.yml }
         Set      = {
@@ -159,14 +146,12 @@ $k8sReqs = @(
         }
     },
     @{
-        Name     = "Deploy Application"
         Describe = "Application deployment"
         Set      = {
             kubectl apply -f $OutputDir/pod.yml
         }
     },
     @{
-        Name     = "Set autoscale"
         Describe = "Configure Autoscale"
         Test     = { kubectl get hpa }
         Set      = {
@@ -174,28 +159,26 @@ $k8sReqs = @(
         }
     },
     @{
-        Name     = "Apply Patching"
         Describe = "Deploy kured"
         Test     = { [boolean] (kubectl describe nodes | grep kured) }
         Set      = {
             kubectl apply -f https://github.com/weaveworks/kured/releases/download/1.2.0/kured-1.2.0-dockerhub.yaml
         }
-    },
-    @{
-        Name     = "Harden Cluster"
-        Describe = "Apply security policy"
-        Test     = { kubectl get psp } # Improve tests
-        Set      = {
-            # Install the aks-preview extension
-            az extension add --name aks-preview
+    }#,
+    # @{
+    #     Describe = "Apply security policy"
+    #     Test     = { kubectl get psp } # Improve tests
+    #     Set      = {
+    #         # Install the aks-preview extension
+    #         az extension add --name aks-preview
 
-            # Update the extension to make sure you have the latest version installed
-            az extension update --name aks-preview
+    #         # Update the extension to make sure you have the latest version installed
+    #         az extension update --name aks-preview
 
-            # Apply default policy
-            az aks update --resource-group sbd --name sbd --enable-pod-security-policy
-        }
-    }
+    #         # Apply default policy
+    #         az aks update --resource-group sbd --name sbd --enable-pod-security-policy
+    #     }
+    # }
 )
 
 $azureReqs | Invoke-Requirement | Format-Checklist
