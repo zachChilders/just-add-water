@@ -180,7 +180,7 @@ $k8sReqs = @(
         Set      = {
             kubectl apply -f https://github.com/weaveworks/kured/releases/download/1.2.0/kured-1.2.0-dockerhub.yaml
         }
-    },
+    }
     # @{
     #     Name     = "Harden Cluster"
     #     Describe = "Apply security policy"
