@@ -3,14 +3,16 @@ $ErrorActionPreference = "Stop"
 $RepoRoot = $PSScriptRoot
 $OutputDir = "$PSScriptRoot/out"
 
-# TODO: Set these better
-$tf_share = "zachterraformstorage"
-$kv_name = "mics-kv"
-$acr_name = "mics233.azurecr.io"
+$tf_share = "sbdtfstorage"
+$kv_name = "sbdvault"
+$acr_name = "sbdacrglobal.azurecr.io"
 
 Import-Module -Name "./modules/jaw"
 
-"Requirements" | % { Import-Module $_ }
+"Requirements" | % {
+    Install-Module -Name $_ -Force
+    Import-Module -Name $_
+}
 
 # Auth Azure and gather subscription secrets
 $azureReqs = @(
@@ -20,9 +22,7 @@ $azureReqs = @(
         Test     = { [boolean] (az account show) }
         Set      = { az login }
     },
-    @{  # This could be done idempotently with a test,
-        # but refreshing the secrets every run allows for
-        # new secrets to be added easily
+    @{
         Name     = "Keyvault Secrets"
         Describe = "Inject Secrets into Session"
         Set      = {
@@ -42,17 +42,17 @@ $tfReqs = @(
     @{
         Name     = "Set Terraform Location"
         Describe = "Enter Terraform Context"
-        Test     = { (Get-Location).Path -eq "$RepoRoot/tf"}
-        Set      = { Set-Location "$RepoRoot/tf"}
-    }
+        Test     = { (Get-Location).Path -eq "$RepoRoot/tf/enclave" }
+        Set      = { Set-Location "$RepoRoot/tf/enclave" }
+    },
     @{
         Name     = "Terraform init"
         Describe = "Initialize terraform environment"
-        Test     = { Test-Path "$PSScriptRoot/tf/.terraform/terraform.tfstate" }
+        Test     = { Test-Path "$PSScriptRoot/tf/enclave/.terraform/terraform.tfstate" }
         Set      = {
             terraform init -backend-config="storage_account_name=$($tf_share)" `
                 -backend-config="container_name=tfstate" `
-                -backend-config="access_key=$($env:terraform_storage_key)" `
+                -backend-config="access_key=$($env:tf_storage_key)" `
                 -backend-config="key=mics.tfstate"
 
             # Ensure state is synchronized across deployments with production
@@ -96,15 +96,16 @@ $dockerReqs = @(
         Set      = {
             $DockerImages = az acr repository list -n mics233 -o json | ConvertFrom-Json
             Get-ContainerNames | % {
+                $ImageName = $_.ImageName
                 if ($ImageName -in $DockerImages) { docker pull mics233.azurecr.io/$ImageName }
             }
             Set-k8sConfig -AppPath "./app" -OutPath "./out"
         }
     },
     @{
-        Name      = "Build Docker Containers"
-        Describe  = "Build all containers"
-        Set       = {
+        Name     = "Build Docker Containers"
+        Describe = "Build all containers"
+        Set      = {
             $list = Get-Content ./out/k8s.json | ConvertFrom-Json
             $list | % { docker build -t "$acr_name/$($_.ImageName)" -f $_.Name $_.Path }
         }
@@ -152,7 +153,7 @@ $k8sReqs = @(
 
             $service_data = @{
                 "service_name" = "pegasus"
-                "port"         = 80 # This needs to enforce 443 - See issue #41
+                "port"         = 80   # This needs to enforce 443 - See issue #41
             }
             Expand-Template -Template $service_template -Data $service_data | Out-File $OutputDir/pod.yml -Append
         }
@@ -180,21 +181,34 @@ $k8sReqs = @(
             kubectl apply -f https://github.com/weaveworks/kured/releases/download/1.2.0/kured-1.2.0-dockerhub.yaml
         }
     },
-    @{
-        Name     = "Harden Cluster"
-        Describe = "Apply security policy"
-        Test     = { kubectl get psp } # Improve tests
-        Set      = {
-            # Install the aks-preview extension
-            az extension add --name aks-preview
+    # @{
+    #     Name     = "Harden Cluster"
+    #     Describe = "Apply security policy"
+    #     # Test     = { kubectl get psp } # Improve tests
+    #     Set      = {
+    #         # Install the aks-preview extension
+    #         az extension add --name aks-preview
 
-            # Update the extension to make sure you have the latest version installed
-            az extension update --name aks-preview
+    #         # Update the extension to make sure you have the latest version installed
+    #         az extension update --name aks-preview
 
-            # Apply default policy
-            az aks update --resource-group sbd --name sbd --enable-pod-security-policy
-        }
-    }
+    #         # Apply default policy
+    #         az aks update --resource-group sbd --name sbd --enable-pod-security-policy
+
+    #         $security_template = (Get-Content ./templates/k8s/security.yml | Join-String -Separator "`n")
+    #         $template_data = @{
+    #             "service_name" = "sec2"
+    #         }
+    #         Expand-Template -Template $security_template -Data $template_data | Out-File $OutputDir/sec2.yml -Append
+    #     }
+    # },
+    # @{
+    #     Name     = "Deploy Security Policy"
+    #     Describe = "Security Policy deployment"
+    #     Set      = {
+    #         kubectl apply -f $OutputDir/sec2.yml
+    #     }
+    # }
 )
 
 $azureReqs | Invoke-Requirement | Format-Checklist

@@ -21,7 +21,7 @@ variable resource_group_name {
 }
 
 variable location {
-  default = "Central US"
+  default = "South Central US"
 }
 
 variable log_analytics_workspace_name {
