@@ -1,6 +1,4 @@
 $RepoRoot = "$PSScriptRoot/../.."
-$ScriptsRoot = "$RepoRoot/.test/scripts"
-$OutRoot = "$ScriptsRoot/../out"
 
 Describe "Validate Deploy.ps1" {
     BeforeAll {

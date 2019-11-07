@@ -1,3 +1,6 @@
+$RepoRoot = "$PSScriptRoot/../.."
+$OutDir = "$RepoRoot/out"
+
 # Delete k8s Resource Group
 $azResourceGroups = (az group list) | ConvertFrom-Json
 $azName = ($azResourceGroups | ? {$_.Name -like "sbd"}).name
@@ -15,7 +18,9 @@ rm terraform.tfstate
 rm terraform.tfstate.backup
 
 # Delete just-add-water files
-rm ../../out/azurek8s
-rm ../../out/out.plan
-rm ../../out/k8s.json
-Set-Location ../..
+rm $OutDir/azurek8s
+rm $OutDir/out.plan
+rm $OutDir/k8s.json
+rm $OutDir/pod.yml
+
+Set-Location $RepoRoot
