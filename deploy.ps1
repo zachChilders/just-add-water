@@ -164,7 +164,33 @@ $k8sReqs = @(
         Set      = {
             kubectl apply -f https://github.com/weaveworks/kured/releases/download/1.2.0/kured-1.2.0-dockerhub.yaml
         }
-    }#,
+    },
+    @{
+        Describe = "Create DNS Name"
+        Test     = {
+            $rg = "MC_sbd_sbd_southcentralus"
+            $name = (az network public-ip list --resource-group MC_sbd_sbd_southcentralus | convertfrom-json).name
+            (az network public-ip show -g $rg -n $name | convertfrom-json).dnssettings.domainnamelabel -eq "mics-sbd"
+        }
+        Set      = {
+            $rg = "MC_sbd_sbd_southcentralus"
+            $name = (az network public-ip list --resource-group MC_sbd_sbd_southcentralus | convertfrom-json).name
+            az network public-ip update -g $rg -n $name --dns-name mics-sbd
+        }
+    },
+    @{
+        Describe = "Update Traffic Manager"
+        Test     = {
+            $rg = "sbd-global"
+            (az network traffic-manager endpoint list -g $rg --profile-name "sbd-atm" | convertfrom-json).name -eq "mics-sbd"
+        }
+        Set      = {
+            $rg = "sbd-global"
+            $id = (az network public-ip list --resource-group MC_sbd_sbd_southcentralus | convertfrom-json).id
+            az network traffic-manager endpoint create -g $rg --profile-name "sbd-atm" -n mics-sbd --type azureEndpoints --target-resource-id $id --endpoint-status enabled
+        }
+    }
+    #,
     # @{
     #     Describe = "Apply security policy"
     #     Test     = { kubectl get psp } # Improve tests
