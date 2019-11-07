@@ -17,7 +17,4 @@ Describe "Validate Deploy.ps1" {
     It "Can Connect to Resources" {
         [boolean] (kubectl get deployment) | Should -Be $true
     }
-    It "Ran All Hardening Scripts" {
-        $true
-    }
 }
