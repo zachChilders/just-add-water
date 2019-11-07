@@ -56,7 +56,7 @@ $azureReqs = @(
             $groupMembers = (az ad group member list --group sbdadmin | ConvertFrom-Json).objectId
             $memberId -in $groupMembers
         }
-        Set = {
+        Set      = {
             $memberId = (az ad signed-in-user show | ConvertFrom-Json).objectid
             az ad group member add --group sbdadmin --member $memberId
         }
@@ -171,18 +171,21 @@ Get-Content $OutputDir/global `
     } | Invoke-Requirement | Format-Checklist
 }
 
-# Set random secrets
-# TODO: Fix username
-"TF-VAR-sql-user", "TF-VAR-sql-password" `
-| % {
-    New-Variable -Name "secretname" -Value $_ -Scope "local" -Force
+# Set SQL secrets
+@(
     @{
-        Describe = "Randomized Secret '$secretname' exists"
+        Describe = "Randomized Secret 'TF-VAR-sql-user' exists"
         Set      = {
-            az keyvault secret set --name $secretname --vault-name $env:kv_name --value ([guid]::newguid().Guid).replace("-","").substring(0,14)
+            az keyvault secret set --name "TF-VAR-sql-user" --vault-name $env:kv_name --value "sbdadmin"
         }
-    } | Invoke-Requirement | Format-Checklist
-}
+    },
+    @{
+        Describe = "Randomized Secret 'TF-VAR-sql-password' exists"
+        Set      = {
+            az keyvault secret set --name "TF-VAR-sql-password" --vault-name $env:kv_name --value ([guid]::newguid().Guid).replace("-", "").substring(0, 14)
+        }
+    }) | Invoke-Requirement | Format-Checklist
+
 
 # Set SSH keys
 @(

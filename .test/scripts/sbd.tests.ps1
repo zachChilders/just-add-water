@@ -15,6 +15,6 @@ Describe "Validate Deploy.ps1" {
         (Invoke-WebRequest sbd.trafficmanager.net).StatusCode | Should -Be 200
     }
     It "Can Connect to Resources" {
-        [boolean] (kubectl get deployment) | Should -Be $true
+        [boolean] (kubectl get deployment) | Should -BeTrue
     }
 }

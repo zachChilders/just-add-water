@@ -21,5 +21,3 @@ RUN apt-get update && apt-get -y install git procps jq apt-transport-https ca-ce
 
 ADD ./Install-Dependencies.ps1 ./Install-Dependencies.ps1
 RUN pwsh ./Install-Dependencies.ps1
-
-ADD jaw /usr/bin/jaw
