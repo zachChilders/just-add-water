@@ -6,21 +6,16 @@ $RepoRoot = "$PSScriptRoot/../.."
 $OutDir = "$RepoRoot/out"
 
 # Delete k8s Resource Group
-$azResourceGroups = (az group list) | ConvertFrom-Json
-$azName = ($azResourceGroups | ? { $_.Name -like $EnclaveName }).name
-az group delete --name $azName -y
+az group delete --name $EnclaveName -y
 
 
 # Delete Infrastructure Resource Group
-$azResourceGroups = (az group list) | ConvertFrom-Json
-$azName = ($azResourceGroups | ? { $_.Name -like "MC_$($EnclaveName)_$($EnclaveName)_southcentralus" }).name
-az group delete --name $azName -y
+az group delete --name "MC_$($EnclaveName)_$($EnclaveName)_southcentralus" -y
 
 # Delete TM Endpoint
 az network traffic-manager endpoint delete -g "sbd-global" --profile-name "sbd-atm" --type "azureEndpoints" --name $EnclaveName
 
 # Delete just-add-water files
-Remove-Item -Recurse "./.terraform" -Force
 
 "./terraform.tfstate",
 "./terraform.tfstate.backup",
@@ -32,3 +27,5 @@ Remove-Item -Recurse "./.terraform" -Force
 }
 
 Set-Location $RepoRoot
+
+exit(0)
