@@ -28,6 +28,9 @@ $azureReqs = @(
             if ([boolean] $env:GITHUB_CLIENT_SECRET -and `
                 [boolean] $env:GITHUB_TENANT) {
                 az login --service-principal -u "http://sbdsp" -p $env:GITHUB_CLIENT_SECRET --tenant $env:GITHUB_TENANT
+                $account = (az account list | ConvertFrom-Json)
+                $env:ARM_SUBSCRIPTION_ID = $account.id
+                $env:ARM_TENANT_ID = $account.tenantId
             }
             else {
                 az login
@@ -44,6 +47,8 @@ $azureReqs = @(
                 $NAME = $_.Replace("-", "_")
                 [Environment]::SetEnvironmentVariable($NAME, $SECRET)
             }
+            $env:ARM_CLIENT_ID = $env:TF_VAR_client_id
+            $env:ARM_CLIENT_SECRET = $env:TF_VAR_client_secret
         }
     }
 )
