@@ -1,7 +1,12 @@
+param(
+    [string]$EnclaveName = "sbd"
+)
+
 $ErrorActionPreference = "Stop"
 
 $RepoRoot = $PSScriptRoot
 $OutputDir = "$PSScriptRoot/out"
+
 
 $tf_share = "sbdtfstorage"
 $kv_name = "sbdvault"
@@ -55,10 +60,11 @@ $tfReqs = @(
         Test     = { Test-Path "$PSScriptRoot/tf/enclave/.terraform/terraform.tfstate" }
         Set      = {
             $env:TF_IN_AUTOMATION = "true"
+            $env:TF_VAR_name_prefix = $EnclaveName
             terraform init -backend-config="storage_account_name=$($tf_share)" `
                 -backend-config="container_name=tfstate" `
                 -backend-config="access_key=$($env:tf_storage_key)" `
-                -backend-config="key=mics.tfstate"
+                -backend-config="key=$EnclaveName.tfstate"
 
             # Ensure state is synchronized across deployments with production
             terraform refresh
@@ -66,21 +72,21 @@ $tfReqs = @(
     },
     @{
         Describe = "Plan terraform environment"
-        Test     = { Test-Path "$OutputDir/out.plan" }
+        Test     = { Test-Path "$OutputDir/$EnclaveName.plan" }
         Set      = {
             New-Item -Path "$OutputDir" -ItemType Directory -Force
-            terraform plan -out "$OutputDir/out.plan" -refresh=true
+            terraform plan -out "$OutputDir/$EnclaveName.plan" -refresh=true
         }
     },
     @{
         Describe = "Apply Terraform plan"
         Test     = { [boolean] (terraform output host) }
-        Set      = { terraform apply "$OutputDir/out.plan" }
+        Set      = { terraform apply "$OutputDir/$EnclaveName.plan" }
     },
     @{
         Describe = "Generate k8s File"
-        Test     = { Test-Path "$OutputDir/azurek8s" }
-        Set      = { terraform output kube_config | Out-File "$OutputDir/azurek8s" }
+        Test     = { Test-Path "$OutputDir/$EnclaveName" }
+        Set      = { terraform output kube_config | Out-File "$OutputDir/$EnclaveName" }
     },
     @{
         Describe = "Restore Location"
@@ -125,14 +131,14 @@ $k8sReqs = @(
     @{
         Describe = "Load k8s config"
         Set      = {
-            $env:KUBECONFIG = "./out/azurek8s"
+            $env:KUBECONFIG = "$OutputDir/$EnclaveName"
         }
     },
     @{
         Describe = "Generate pod.yml"
         Test     = { Test-Path $OutputDir/pod.yml }
         Set      = {
-            $list = Get-Content ./out/k8s.json | ConvertFrom-Json
+            $list = Get-Content $OutputDir/k8s.json | ConvertFrom-Json
             $deploy_template = (Get-Content ./templates/k8s/deployment.yml | Join-String -Separator "`n" )
             $service_template = (Get-Content ./templates/k8s/service.yml | Join-String -Separator "`n")
 
@@ -177,27 +183,27 @@ $k8sReqs = @(
     @{
         Describe = "Create DNS Name"
         Test     = {
-            $rg = "MC_sbd_sbd_southcentralus"
+            $rg = "MC_$($EnclaveName)_$($EnclaveName)_southcentralus"
             $name = (az network public-ip list -g $rg | ConvertFrom-Json).name
-            (az network public-ip show -g $rg -n $name | ConvertFrom-Json).dnssettings.domainnamelabel -eq "mics-sbd"
+            (az network public-ip show -g $rg -n $name | ConvertFrom-Json).dnssettings.domainnamelabel -eq "$EnclaveName"
         }
         Set      = {
-            $rg = "MC_sbd_sbd_southcentralus"
+            $rg = "MC_$($EnclaveName)_$($EnclaveName)_southcentralus"
             $name = (az network public-ip list -g $rg | ConvertFrom-Json).name
-            az network public-ip update -g $rg -n $name --dns-name mics-sbd
+            az network public-ip update -g $rg -n $name --dns-name "$EnclaveName"
         }
     },
     @{
         Describe = "Update Traffic Manager"
         Test     = {
             $rg = "sbd-global"
-            (az network traffic-manager endpoint list -g $rg --profile-name "sbd-atm" | ConvertFrom-Json).name -eq "mics-sbd"
+            (az network traffic-manager endpoint list -g $rg --profile-name "sbd-atm" | ConvertFrom-Json).name -eq $EnclaveName
         }
         Set      = {
             $rg = "sbd-global"
-            $iprg = "MC_sbd_sbd_southcentralus"
+            $iprg = "MC_$($EnclaveName)_$($EnclaveName)_southcentralus"
             $id = (az network public-ip list -g $iprg | ConvertFrom-Json).id
-            az network traffic-manager endpoint create -g $rg --profile-name "sbd-atm" -n mics-sbd --type azureEndpoints --target-resource-id $id --endpoint-status enabled --weight 1
+            az network traffic-manager endpoint create -g $rg --profile-name "sbd-atm" -n $EnclaveName --type azureEndpoints --target-resource-id $id --endpoint-status enabled --weight 1
         }
     }
     #,

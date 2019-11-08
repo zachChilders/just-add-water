@@ -3,29 +3,13 @@ variable "client_secret" {}
 variable "ssh_public_key" {}
 variable "sql_user" {}
 variable "sql_password" {}
-
+variable "name_prefix" {}
 variable "agent_count" {
   default = 3
 }
 
-variable "dns_prefix" {
-  default = "sbd"
-}
-
-variable cluster_name {
-  default = "sbd"
-}
-
-variable resource_group_name {
-  default = "sbd"
-}
-
 variable location {
   default = "South Central US"
-}
-
-variable log_analytics_workspace_name {
-  default = "sbdworkspace"
 }
 
 # refer https://azure.microsoft.com/global-infrastructure/services/?products=monitor for log analytics available regions
