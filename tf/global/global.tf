@@ -43,11 +43,6 @@ resource "azurerm_container_registry" "global-acr" {
   admin_enabled       = true
 }
 
-resource "azurerm_dns_zone" "global-dns" {
-  name                = "sbd-pegasus.com"
-  resource_group_name = azurerm_resource_group.global-rg.name
-}
-
 resource "azurerm_storage_account" "global-tfstore" {
   name                      = "sbdtfstorage"
   resource_group_name       = azurerm_resource_group.global-rg.name

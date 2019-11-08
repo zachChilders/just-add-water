@@ -1,10 +1,10 @@
 resource "azurerm_resource_group" "rg" {
-  name     = "${var.resource_group_name}"
+  name     = "${var.name_prefix}"
   location = "${var.location}"
 }
 
 resource "azurerm_log_analytics_workspace" "law" {
-  name                = "${var.log_analytics_workspace_name}"
+  name                = "${var.name_prefix}workspace"
   location            = "${var.log_analytics_workspace_location}"
   resource_group_name = "${azurerm_resource_group.rg.name}"
   sku                 = "${var.log_analytics_workspace_sku}"
@@ -24,10 +24,10 @@ resource "azurerm_log_analytics_solution" "las" {
 }
 
 resource "azurerm_kubernetes_cluster" "k8s" {
-  name                = "${var.cluster_name}"
+  name                = "${var.name_prefix}"
   location            = "${azurerm_resource_group.rg.location}"
   resource_group_name = "${azurerm_resource_group.rg.name}"
-  dns_prefix          = "${var.dns_prefix}"
+  dns_prefix          = "${var.name_prefix}"
 
   linux_profile {
     admin_username = "ubuntu"

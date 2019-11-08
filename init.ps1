@@ -14,7 +14,6 @@ Import-Module -Name "./modules/jaw"
 # Auth Azure and gather subscription secrets
 $azureReqs = @(
     @{
-        Name     = "Azure Login"
         Describe = "Authenticate Azure Session"
         Test     = { [boolean] (az account show) }
         Set      = { az login }
@@ -57,26 +56,22 @@ $azureReqs = @(
             $groupMembers = (az ad group member list --group sbdadmin | ConvertFrom-Json).objectId
             $memberId -in $groupMembers
         }
-        Set = {
+        Set      = {
             $memberId = (az ad signed-in-user show | ConvertFrom-Json).objectid
             az ad group member add --group sbdadmin --member $memberId
         }
     }
 )
 
-### Generating Secrets ###
-
 # Detect global infra
 $globalReqs = @(
     @{
-        Name     = "Set Terraform Location"
         Describe = "Enter Terraform Context"
         Test     = { (Get-Location).Path -eq "$RepoRoot/tf/global" }
         Set      = { Set-Location "$RepoRoot/tf/global" }
     },
     @{
-        Name     = "Terraform init"
-        Describe = "Initialize terraform environment"
+        Describe = "Initialize Terraform Environment"
         Test     = { Test-Path "$PSScriptRoot/tf/global/.terraform" }
         Set      = {
             terraform init
@@ -84,8 +79,7 @@ $globalReqs = @(
         }
     },
     @{
-        Name     = "Terraform plan"
-        Describe = "Plan terraform environment"
+        Describe = "Plan Terraform Environment"
         Test     = { Test-Path "$OutputDir/global.plan" }
         Set      = {
             New-Item -Path "$OutputDir" -ItemType Directory -Force
@@ -93,12 +87,10 @@ $globalReqs = @(
         }
     },
     @{
-        Name     = "Terraform Apply"
         Describe = "Apply Terraform plan"
         Set      = { terraform apply "$OutputDir/global.plan" }
     },
     @{
-        Name     = "Generate Config"
         Describe = "Generate Global Config File"
         Test     = { Test-Path "$OutputDir/global" }
         Set      = {
@@ -108,7 +100,6 @@ $globalReqs = @(
         }
     },
     @{
-        Name     = "Restore Repo Directory"
         Describe = "Restore Location"
         Test     = { (Get-Location).Path -eq $RepoRoot }
         Set      = { Set-Location $RepoRoot }
@@ -168,7 +159,7 @@ Get-Content $OutputDir/global `
 }
 
 # Set environment secrets
-"TF_VAR_client_id", "TF_VAR_client_id" `
+"TF_VAR_client_id", "TF_VAR_client_secret" `
 | % {
     New-Variable -Name "secretname" -Value $_ -Scope "local" -Force
     New-Variable -Name $_ -Value ([Environment]::GetEnvironmentVariable($_)) -Scope "local" -Force
@@ -180,17 +171,21 @@ Get-Content $OutputDir/global `
     } | Invoke-Requirement | Format-Checklist
 }
 
-# Set random secrets
-"TF-VAR-sql-user", "TF-VAR-sql-password" `
-| % {
-    New-Variable -Name "secretname" -Value $_ -Scope "local" -Force
+# Set SQL secrets
+@(
     @{
-        Describe = "Randomized Secret '$secretname' exists"
+        Describe = "Randomized Secret 'TF-VAR-sql-user' exists"
         Set      = {
-            az keyvault secret set --name $secretname --vault-name $env:kv_name --value ([guid]::newguid().Guid).replace("-","").substring(0,14)
+            az keyvault secret set --name "TF-VAR-sql-user" --vault-name $env:kv_name --value "sbdadmin"
         }
-    } | Invoke-Requirement | Format-Checklist
-}
+    },
+    @{
+        Describe = "Randomized Secret 'TF-VAR-sql-password' exists"
+        Set      = {
+            az keyvault secret set --name "TF-VAR-sql-password" --vault-name $env:kv_name --value ([guid]::newguid().Guid).replace("-", "").substring(0, 14)
+        }
+    }) | Invoke-Requirement | Format-Checklist
+
 
 # Set SSH keys
 @(

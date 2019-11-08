@@ -16,5 +16,8 @@ jobs:
         shell: pwsh
         run: ./.github/scripts/Assert-Linting
       - name: Test code
+        env: 
+          GITHUB_CLIENT_SECRET: ${{secrets.GITHUB_CLIENT_SECRET}}
+          GITHUB_TENANT: ${{secrets.GITHUB_TENANT}}
         shell: pwsh
         run: ./.github/scripts/Assert-Tests
