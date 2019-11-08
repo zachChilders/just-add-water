@@ -16,6 +16,9 @@ We currently are focused on Azure based infrastructure, but want to support as m
 
 jaw applies defense in depth to existing codebases to establish a secure baseline and improve your security posture with every deployment.
 
+## Features
+[Full Detail](docs/features.md)
+
 ## Usage
 
 1. Generate a new repo using [this repo as a template](https://github.com/zachChilders/just-add-water/generate)
