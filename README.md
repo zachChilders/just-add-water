@@ -1,6 +1,6 @@
 # Just Add Water
 
-![Just Add Water](.images/martians.png)
+![Just Add Water](images/martians.png)
 
 ## Instant Cloud Scale, No Matter What You Deploy
 
@@ -15,6 +15,9 @@ We currently are focused on Azure based infrastructure, but want to support as m
 ## Secure By Design
 
 jaw applies defense in depth to existing codebases to establish a secure baseline and improve your security posture with every deployment.
+
+## Features
+[Full Detail](docs/features.md)
 
 ## Usage
 
