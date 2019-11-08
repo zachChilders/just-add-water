@@ -15,9 +15,6 @@ jobs:
       - name: Lint code
         shell: pwsh
         run: ./.github/scripts/Assert-Linting
-      - name: Install Dependencies
-        shell: pwsh
-        run: ./.devcontainer/Install-Dependencies
       - name: Test code
         env: 
           GITHUB_CLIENT_SECRET: ${{secrets.GITHUB_CLIENT_SECRET}}
