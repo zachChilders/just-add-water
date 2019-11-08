@@ -1,12 +1,12 @@
-$RepoRoot = "$PSScriptRoot/../.."
+#$RepoRoot = "$PSScriptRoot/../.."
 
 Describe "Validate Deploy.ps1" {
     BeforeAll {
         git submodule update --init
-        & "$RepoRoot/deploy.ps1"
+        # & "$RepoRoot/deploy.ps1"
     }
     AfterAll {
-        & "$RepoRoot/tf/enclave/clean.ps1"
+       # & "$RepoRoot/tf/enclave/clean.ps1"
     }
     It "Created Azure Resources" {
         az group exists --name sbd | Should -Be "true"
