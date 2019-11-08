@@ -19,5 +19,8 @@ jobs:
         shell: pwsh
         run: ./.devcontainer/Install-Dependencies
       - name: Test code
+        env: 
+          GITHUB_CLIENT_SECRET: ${{secrets.GITHUB_CLIENT_SECRET}}
+          GITHUB_TENANT: ${{secrets.GITHUB_TENANT}}
         shell: pwsh
         run: ./.github/scripts/Assert-Tests

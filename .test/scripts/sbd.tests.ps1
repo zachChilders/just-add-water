@@ -12,6 +12,7 @@ Describe "Validate Deploy.ps1" {
         az group exists --name sbd | Should -Be "true"
     }
     It "Renders an Actual Page" {
+        Start-Sleep -Seconds 60 # Ensure DNS has time to propagate
         (Invoke-WebRequest sbd.trafficmanager.net).StatusCode | Should -Be 200
     }
     It "Can Connect to Resources" {

@@ -19,7 +19,15 @@ $azureReqs = @(
     @{
         Describe = "Authenticate Azure Session"
         Test     = { [boolean] (az account show) }
-        Set      = { az login }
+        Set      = {
+            if ([boolean] $env:GITHUB_CLIENT_SECRET -and `
+                [boolean] $env:GITHUB_TENANT) {
+                az login --service-principal -u "http://azure-cli-2016-08-05-14-31-15" -p $env:GITHUB_CLIENT_SECRET --tenant $env:GITHUB_TENANT
+            }
+            else {
+                az login
+            }
+        }
     },
     @{
         Describe = "Inject Secrets into Session"
@@ -46,6 +54,7 @@ $tfReqs = @(
         Describe = "Initialize Terraform Environment"
         Test     = { Test-Path "$PSScriptRoot/tf/enclave/.terraform/terraform.tfstate" }
         Set      = {
+            $env:TF_IN_AUTOMATION = "true"
             terraform init -backend-config="storage_account_name=$($tf_share)" `
                 -backend-config="container_name=tfstate" `
                 -backend-config="access_key=$($env:tf_storage_key)" `
