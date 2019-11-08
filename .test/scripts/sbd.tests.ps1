@@ -12,7 +12,7 @@ Describe "Validate Deploy.ps1" {
         az group exists --name micssbdtest | Should -Be "true"
     }
     It "Renders an Actual Page" {
-        Start-Sleep -Seconds 60 # Ensure DNS has time to propagate
+        Start-Sleep -Seconds 90 # Ensure DNS has time to propagate
         (Invoke-WebRequest micssbdtest.southcentralus.cloudapp.azure.com).StatusCode | Should -Be 200
     }
     It "Can Connect to Resources" {
