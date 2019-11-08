@@ -27,7 +27,7 @@ $azureReqs = @(
         Set      = {
             if ([boolean] $env:GITHUB_CLIENT_SECRET -and `
                 [boolean] $env:GITHUB_TENANT) {
-                az login --service-principal -u "http://azure-cli-2016-08-05-14-31-15" -p $env:GITHUB_CLIENT_SECRET --tenant $env:GITHUB_TENANT
+                az login --service-principal -u "http://sbdsp" -p $env:GITHUB_CLIENT_SECRET --tenant $env:GITHUB_TENANT
             }
             else {
                 az login
