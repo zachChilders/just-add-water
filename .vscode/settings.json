@@ -6,5 +6,5 @@
     "powershell.enableProfileLoading": false,
     "powershell.scriptAnalysis.enable": true,
     "powershell.scriptAnalysis.settingsPath": "PSScriptAnalyzerSettings.psd1",
-    "powershell.startAutomatically": true
+    "terminal.integrated.shell.linux": "/usr/bin/pwsh",
 }
