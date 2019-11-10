@@ -6,6 +6,8 @@ $ErrorActionPreference = "Stop"
 
 $RepoRoot = $PSScriptRoot
 $OutputDir = "$PSScriptRoot/out"
+$TemplateDir = "$RepoRoot/templates"
+$SecurityDir = "$RepoRoot/security"
 
 
 $tf_share = "sbdtfstorage"
@@ -19,14 +21,16 @@ Import-Module -Name "./modules/jaw"
     Import-Module -Name $_
 }
 
+# Detect if we're running in a github action
+$RunningInCI = ([boolean] $env:GITHUB_CLIENT_SECRET -and [boolean] $env:GITHUB_TENANT)
+
 # Auth Azure and gather subscription secrets
 $azureReqs = @(
     @{
         Describe = "Authenticate Azure Session"
         Test     = { [boolean] (az account show) }
         Set      = {
-            if ([boolean] $env:GITHUB_CLIENT_SECRET -and `
-                [boolean] $env:GITHUB_TENANT) {
+            if ($RunningInCI) {
                 az login --service-principal -u "http://sbdsp" -p $env:GITHUB_CLIENT_SECRET --tenant $env:GITHUB_TENANT
                 $account = (az account list | ConvertFrom-Json)
                 $env:ARM_SUBSCRIPTION_ID = $account.id
@@ -47,8 +51,10 @@ $azureReqs = @(
                 $NAME = $_.Replace("-", "_")
                 [Environment]::SetEnvironmentVariable($NAME, $SECRET)
             }
-            $env:ARM_CLIENT_ID = $env:TF_VAR_client_id
-            $env:ARM_CLIENT_SECRET = $env:TF_VAR_client_secret
+            if ($RunningInCI) {
+                $env:ARM_CLIENT_ID = $env:TF_VAR_client_id
+                $env:ARM_CLIENT_SECRET = $env:TF_VAR_client_secret
+            }
         }
     }
 )
@@ -144,8 +150,8 @@ $k8sReqs = @(
         Test     = { Test-Path $OutputDir/pod.yml }
         Set      = {
             $list = Get-Content $OutputDir/k8s.json | ConvertFrom-Json
-            $deploy_template = (Get-Content ./templates/k8s/deployment.yml | Join-String -Separator "`n" )
-            $service_template = (Get-Content ./templates/k8s/service.yml | Join-String -Separator "`n")
+            $deploy_template = (Get-Content $TemplateDir/deployment.yml | Join-String -Separator "`n" )
+            $service_template = (Get-Content $TemplateDir/service.yml | Join-String -Separator "`n")
 
             $list | % {
                 $deploy_data = @{
@@ -210,35 +216,29 @@ $k8sReqs = @(
             $id = (az network public-ip list -g $iprg | ConvertFrom-Json).id
             az network traffic-manager endpoint create -g $rg --profile-name "sbd-atm" -n $EnclaveName --type azureEndpoints --target-resource-id $id --endpoint-status enabled --weight 1
         }
+    },
+    @{
+        Describe = "Generate Security Templates"
+        Test = {Test-Path "$SecurityDir/firewall.yml"}
+        Set = {
+            $firewall_template = (Get-Content $TemplateDir/block-egress.yml | Join-String -Separator "`n")
+
+            $firewall_data = @{
+                "service_name" = "pegasus"
+            }
+            Expand-Template -Template $firewall_template -Data $firewall_data | Out-File $SecurityDir/firewall.yml -Append
+        }
     }
-    #,
-    # @{
-    #     Describe = "Apply security policy"
-    #     Test     = { kubectl get psp } # Improve tests
-    #     Set      = {
-    #         # Install the aks-preview extension
-    #         az extension add --name aks-preview
-
-    #         # Update the extension to make sure you have the latest version installed
-    #         az extension update --name aks-preview
-
-    #         # Apply default policy
-    #         az aks update --resource-group sbd --name sbd --enable-pod-security-polic
-
-    #         $security_template = (Get-Content ./templates/k8s/security.yml | Join-String -Separator "`n")
-    #         $template_data = @{
-    #             "service_name" = "sec2"
-    #         }
-    #         Expand-Template -Template $security_template -Data $template_data | Out-File $OutputDir/sec2.yml -Append
-    #     }
-    # },
-    # @{
-    #     Name     = "Deploy Security Policy"
-    #     Describe = "Security Policy deployment"
-    #     Set      = {
-    #         kubectl apply -f $OutputDir/sec2.yml
-    #     }
-    # }
+    @{
+        Describe = "Security Policy Deployment"
+        Set      = {
+            "$SecurityDir/firewall.yml",
+            "$SecurityDir/restrict-cr.yml",
+            "$SecurityDir/restrict.yml" | % {
+                kubectl apply -f $_
+            }
+        }
+    }
 )
 
 $azureReqs | Invoke-Requirement | Format-Checklist

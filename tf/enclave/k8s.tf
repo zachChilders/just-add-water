@@ -63,7 +63,7 @@ resource "azurerm_kubernetes_cluster" "k8s" {
 }
 
 resource "azurerm_mysql_server" "mysql" {
-  name                = "mics-pegasus"
+  name                = "${var.name_prefix}-pegasus"
   location            = "${azurerm_resource_group.rg.location}"
   resource_group_name = "${azurerm_resource_group.rg.name}"
 
