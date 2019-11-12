@@ -1,3 +1,6 @@
 [submodule "app/sanity"]
 	path = app/sanity
 	url = https://github.com/mics-sbd/sanity
+[submodule "app/wgt"]
+	path = app/wgt
+	url = https://github.com/mics-sbd/wgt.git

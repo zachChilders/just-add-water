@@ -60,8 +60,14 @@ function Set-k8sConfig {
     $Path = $_.Directory
     # This resolves to the folder directly beneath /app
     $ImageName = ($Path -split "/")[-1]
+
+    # We have to build a container if it doesn't exist already to break chicken and egg - this is hacky.
+    if (-not  [boolean](docker image ls | Select-String sbdacrglobal.azurecr.io/$ImageName)){
+      docker build -f $Path -t sbdacrglobal.azurecr.io/$ImageName
+    }
+
     # Query inactive container for config
-    $Config = docker inspect mics233.azurecr.io/$ImageName --format="{{json .Config}}"
+    $Config = docker inspect sbdacrglobal.azurecr.io/$ImageName --format="{{json .Config}}"
     # Extract port numbers out of config
     if (-not [string]::IsNullOrEmpty($Config)) {
       $Ports = ($Config | ConvertFrom-Json -AsHashtable).ExposedPorts.Keys | % { ($_ -split "/")[0] }

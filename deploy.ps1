@@ -253,7 +253,7 @@ $k8sReqs = @(
             }
             Expand-Template -Template $firewall_template -Data $firewall_data | Out-File $SecurityDir/firewall.yml -Append
         }
-    }
+    },
     @{
         Describe = "Security Policy Deployment"
         # TODO: Set a test here to ensure proper application
