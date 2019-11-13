@@ -17,6 +17,7 @@ We currently are focused on Azure based infrastructure, but want to support as m
 jaw applies defense in depth to existing codebases to establish a secure baseline and improve your security posture with every deployment.
 
 ## Features
+
 [Full Detail](docs/features.md)
 
 ## Usage
@@ -24,6 +25,8 @@ jaw applies defense in depth to existing codebases to establish a secure baselin
 1. Generate a new repo using [this repo as a template](https://github.com/zachChilders/just-add-water/generate)
 2. `git submodule update` whatever docker application you need.
 3. Run deploy.ps1
+
+See [Onboarding](docs/onboarding.md) for full details.
 
 ## Dependencies
 
@@ -45,7 +48,3 @@ If you would prefer a purely native environment, you can install the following d
 - [Terraform](https://www.terraform.io/downloads.html)
 
 - kubectl - `az aks install-cli`
-
-You also will need to have access to an Azure subscription with the following dedicated resources available to your user account:
-- Container Registry
-- Key Vault
