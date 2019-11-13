@@ -195,6 +195,12 @@ $k8sReqs = @(
         }
     },
     @{
+        Describe = "Upload Kube Secrets"
+        Set = {
+            kubectl create secret generic sharedsecrets --from-literal=jwt=$([guid]::NewGuid().Guid)
+        }
+    },
+    @{
         Describe = "Configure Autoscale"
         Test     = { kubectl get hpa }
         Set      = {

@@ -16,3 +16,9 @@ spec:
           image: {{cr_name}}/{{image_name}}
           ports:
             - containerPort: {{port}}
+          env:
+        - name: SBD_KEY
+          valueFrom:
+            secretKeyRef:
+              name: sharedsecrets
+              key: jwt

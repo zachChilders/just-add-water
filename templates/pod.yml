@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{deploy_name}}
+spec:
+  containers:
+  - name: {{image_name}}
+    image: {{cr_name}}/{{image_name}}
+    env:
+      - name: SBD_KEY
+        valueFrom:
+          secretKeyRef:
+            name: sharedsecrets
+            key: jwt
+  restartPolicy: Never
