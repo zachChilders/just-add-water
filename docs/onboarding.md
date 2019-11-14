@@ -13,7 +13,7 @@ You will need:
 Once you have your dependencies ready, click the "Use This Template" button:
 ![Use This Template](../images/templatebutton.png)
 
-Fill out the form to name your repo, then clone it as normal.
+Fill out the form to name your repo, then clone it.
 
 ## Install
 
@@ -36,27 +36,27 @@ working to get this down.
 
 ## Initial Provision
 
-The first time you use your Azure Subscriptiong, you need to run `init.ps1` in
+The first time you use your Azure Subscription, you need to run `init.ps1` in
 the Integrated Shell.  This script will create a centralized resource group
 with some infrastructure we use to bootstrap other infrastructure later.
 
 Running this script will prompt you for your Azure credentials and then run a
-deployment that should take about 10 minutes.  If you look at the Azure portal,
- these are the resources you should be left with:
+deployment that should take about 10 minutes.  After installation, if you look at the Azure portal
+ these resources should be installed:
 
 ![Centralized Infrastructure](../images/centralizedinfra.png)
 
-For a complete explanation of infrastructure we provision, see our [infra guide](./infrastructure.md).
+For a complete explanation of the infrastructure we provision, see our [infra guide](./infrastructure.md).
 
 ## Customization
 
 At this point, you can begin building your services.  You can add any dockerized
-application to the `app` folder, and we'll be able to securely deploy it for you.
+application to the `app` folder, and we'll securely deploy it for you.
 We suggest using applications from [our organization](https://github.com/mics-sbd),
 which have all been hardened for you.  If you have a custom app or we're missing one
 you need, you are able to simply add a subfolder with what you're looking for.
 
-We create a seperate container for each dockerfile we find in the subfolder, and
+We create a seperate container for each dockerfile in each subfolder, and
 will automatically deploy it.  We recommend adding folders as git submodules,
 which will let you version them separately from your main infrastructure codebase.
 For a complete explanation of our docker discovery and usage, see our [docker guide](./docker.md).
@@ -76,4 +76,4 @@ did securing the company!  Nice work, hero!
 ## Next Steps
 
 There are additional steps you can take to further secure your infrastructure.  Please visit
-our [next steps suggestions](nextsteps.md) for details.
+our [next steps suggestion guide](nextsteps.md) for details.
