@@ -13,7 +13,7 @@ You will need:
 Once you have your dependencies ready, click the "Use This Template" button:
 ![Use This Template](../images/templatebutton.png)
 
-Fill out the form to name your repo, then clone it as normal.
+Fill out the form to name your repo, then clone it.
 
 ## Install
 
