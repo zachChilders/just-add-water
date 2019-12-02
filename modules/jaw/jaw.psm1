@@ -36,7 +36,18 @@ function Expand-Template {
   Generates a list of container names for later usage.
 #>
 function Get-ContainerNames {
+  param(
+    [string] $AppPath
+  )
   Get-ChildItem -Path $AppPath -Filter "*dockerfile*" -Recurse
+}
+
+
+function Get-KustomizePackages {
+  param(
+    [string] $AppPath
+  )
+  Get-ChildItem -Path $AppPath -Filter "kustomization-template.yaml" -Recurse
 }
 
 <#
@@ -53,7 +64,7 @@ function Set-k8sConfig {
   )
   # parse each Dockerfile in to a K8S JSON
   # we only check for top level dockerfiles right now.
-  Get-ContainerNames | % {
+  Get-KustomizePackages | % {
     # Full File Name
     $Name = $_.FullName
     # Parent Directory

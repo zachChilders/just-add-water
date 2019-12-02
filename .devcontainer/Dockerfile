@@ -14,6 +14,9 @@ RUN apt-get update && apt-get -y install git procps jq apt-transport-https ca-ce
     # Install Docker Compose
     && curl -sSL "https://github.com/docker/compose/releases/download/1.24.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose \
     && chmod +x /usr/local/bin/docker-compose \
+    # Install Kompose
+    && curl -L https://github.com/kubernetes/kompose/releases/download/v1.19.0/kompose-linux-amd64 -o /usr/local/bin/kompose \
+    && chmod +x /usr/local/bin/kompose \
     # Clean up
     && apt-get autoremove -y \
     && apt-get clean -y \
