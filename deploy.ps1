@@ -191,7 +191,7 @@ $k8sReqs = @(
         Test     = { kubectl get hpa }
         Set      = {
             # These values are pretty arbitrary and not measured at all.
-            (kubectl get deployment -o json) | ConvertFrom-Json.items | % {
+            (kubectl get deployment -o json | ConvertFrom-Json).items | % {
                 kubectl autoscale deployment $_.metadata.name --min=2 --max=5 --cpu-percent=80
             }
         }

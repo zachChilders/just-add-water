@@ -10,7 +10,7 @@ Describe "Validate Deploy.ps1" {
         & "$RepoRoot/tf/enclave/clean.ps1" -EnclaveName $EnclaveName
     }
     It "Created Azure Resources" {
-        az group exists --name micssbdtest | Should -Be "true"
+        az group exists --name $EnclaveName | Should -Be "true"
     }
     It "Renders an Actual Page" {
         Start-Sleep -Seconds 90 # Ensure DNS has time to propagate
