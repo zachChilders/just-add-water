@@ -13,7 +13,7 @@ Describe "Validate Deploy.ps1" {
         az group exists --name $EnclaveName | Should -Be "true"
     }
     It "Renders an Actual Page" {
-        Start-Sleep -Seconds 90 # Ensure DNS has time to propagate
+        Start-Sleep -Seconds 300 # Ensure DNS has time to propagate
         (Invoke-WebRequest "$($EnclaveName).southcentralus.cloudapp.azure.com").StatusCode | Should -Be 200
     }
     It "Can Connect to Resources" {
