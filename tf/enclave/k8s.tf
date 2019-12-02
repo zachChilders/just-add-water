@@ -61,27 +61,3 @@ resource "azurerm_kubernetes_cluster" "k8s" {
     enabled = true
   }
 }
-
-resource "azurerm_mysql_server" "mysql" {
-  name                = "${var.name_prefix}-pegasus"
-  location            = "${azurerm_resource_group.rg.location}"
-  resource_group_name = "${azurerm_resource_group.rg.name}"
-
-  sku {
-    name     = "B_Gen5_2"
-    capacity = 2
-    tier     = "Basic"
-    family   = "Gen5"
-  }
-
-  storage_profile {
-    storage_mb            = 5120
-    backup_retention_days = 7
-    geo_redundant_backup  = "Disabled"
-  }
-
-  administrator_login          = "${var.sql_user}"
-  administrator_login_password = "${var.sql_password}"
-  version                      = "5.7"
-  ssl_enforcement              = "Enabled"
-}
