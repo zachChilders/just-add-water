@@ -1,17 +1,19 @@
 
 $RepoRoot = "$PSScriptRoot/../.."
 $ScriptsRoot = "$RepoRoot/.test/scripts"
-$OutRoot = "$ScriptsRoot/../out"
+$OutRoot = "$RepoRoot/.test/out"
 
 Describe "Set-K8sConfig" {
     BeforeAll {
         Import-Module $RepoRoot/modules/jaw
         New-Item -Path $OutRoot -ItemType Directory -Force
         docker build -t "mics233.azurecr.io/data" "./.test/data" -f "./.test/data/test.dockerfile"
-        Set-K8sConfig -AppPath "$ScriptsRoot/../data" -OutPath $OutRoot
+        Set-Location -Path "$RepoRoot/.test"
+        Set-K8sConfig -AppPath "$RepoRoot/.test" -OutPath $OutRoot
     }
     AfterAll {
-        #Remove-Item $OutRoot -Recurse -Force
+        Remove-Item $OutRoot -Recurse -Force
+        Set-Location $RepoRoot
     }
     It "Should create a Json" {
         Test-Path "$OutRoot/k8s.json" | Should -BeTrue
