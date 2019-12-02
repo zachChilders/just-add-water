@@ -61,11 +61,6 @@ $azureReqs = @(
                 $env:ARM_CLIENT_ID = $env:TF_VAR_client_id
                 $env:ARM_CLIENT_SECRET = $env:TF_VAR_client_secret
             }
-
-            [Environment]::SetEnvironmentVariable("WORDPRESS_DB_HOST", "sbd-pegasus")
-            [Environment]::SetEnvironmentVariable("WORDPRESS_DB_NAME", "wpdb")
-            [Environment]::SetEnvironmentVariable("WORDPRESS_DB_USER", "wpuser")
-            [Environment]::SetEnvironmentVariable("WORDPRESS_DB_PASSWORD", "wppass")
         }
     }
 )
