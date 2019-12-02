@@ -61,6 +61,11 @@ $azureReqs = @(
                 $env:ARM_CLIENT_ID = $env:TF_VAR_client_id
                 $env:ARM_CLIENT_SECRET = $env:TF_VAR_client_secret
             }
+
+            [Environment]::SetEnvironmentVariable("WORDPRESS_DB_HOST", "sbd-pegasus")
+            [Environment]::SetEnvironmentVariable("WORDPRESS_DB_NAME", "wpdb")
+            [Environment]::SetEnvironmentVariable("WORDPRESS_DB_USER", "wpuser")
+            [Environment]::SetEnvironmentVariable("WORDPRESS_DB_PASSWORD", "wppass")
         }
     }
 )
@@ -160,38 +165,30 @@ $k8sReqs = @(
         }
     },
     @{
-        Describe = "Generate pod.yml"
-        Test     = { Test-Path $OutputDir/pod.yml }
+        Describe = "Generate kustomization.yaml"
         Set      = {
             # Read manifest and templates
             $list = Get-Content $OutputDir/k8s.json | ConvertFrom-Json
-            $deploy_template = (Get-Content $TemplateDir/deployment.yml | Join-String -Separator "`n" )
-            $service_template = (Get-Content $TemplateDir/service.yml | Join-String -Separator "`n")
 
             # Populate templates from manifest info
             $list | % {
                 $deploy_data = @{
-                    "deploy_name" = "pegasus"
-                    "image_name"  = $_.ImageName
-                    "cr_name"     = $acr_name
-                    "port"        = $_.Ports
+                    "sql_password" = $env:TF_VAR_sql_password
                 }
-                Expand-Template -Template $deploy_template -Data $deploy_data | Out-File $OutputDir/pod.yml -Append
-                "---" | Out-File $OutputDir/pod.yml -Append
-            }
 
-            # Append service info, which should always be the same.
-            $service_data = @{
-                "service_name" = "pegasus"
-                "port"         = 80   # This needs to enforce 443 - See issue #41
+                $deploy_template = (Get-Content $_.Name | Join-String -Separator "`n" )
+                Expand-Template -Template $deploy_template -Data $deploy_data | Out-File "$($_.Path)/kustomization.yaml"
             }
-            Expand-Template -Template $service_template -Data $service_data | Out-File $OutputDir/pod.yml -Append
         }
     },
     @{
         Describe = "Application deployment"
         Set      = {
-            kubectl apply -f $OutputDir/pod.yml
+            # Read manifest and templates
+            $list = Get-Content $OutputDir/k8s.json | ConvertFrom-Json
+            $list | % {
+                kubectl apply -k $_.Path
+            }
         }
     },
     @{
@@ -199,7 +196,9 @@ $k8sReqs = @(
         Test     = { kubectl get hpa }
         Set      = {
             # These values are pretty arbitrary and not measured at all.
-            kubectl autoscale deployment pegasus --min=2 --max=5 --cpu-percent=80
+            (kubectl get deployment -o json) | ConvertFrom-Json.items | % {
+                kubectl autoscale deployment $_.metadata.name --min=2 --max=5 --cpu-percent=80
+            }
         }
     },
     @{
@@ -242,14 +241,14 @@ $k8sReqs = @(
     },
     @{
         Describe = "Generate Security Templates"
-        Test = {Test-Path "$SecurityDir/firewall.yml"}
-        Set = {
+        Test     = { Test-Path "$SecurityDir/firewall.yml" }
+        Set      = {
             # Read block-egress template
             $firewall_template = (Get-Content $TemplateDir/block-egress.yml | Join-String -Separator "`n")
 
             # Populate block-egress template with service name
             $firewall_data = @{
-                "service_name" = "pegasus"
+                "service_name" = "wordpress"
             }
             Expand-Template -Template $firewall_template -Data $firewall_data | Out-File $SecurityDir/firewall.yml -Append
         }

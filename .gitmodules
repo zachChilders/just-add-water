@@ -1,3 +1,6 @@
 [submodule "app/sanity"]
 	path = app/sanity
 	url = https://github.com/mics-sbd/sanity
+[submodule "app/wordpress"]
+	path = app/wordpress
+	url = https://github.com/mics-sbd/wordpress.git

@@ -28,7 +28,7 @@ resource "azurerm_kubernetes_cluster" "k8s" {
   location            = "${azurerm_resource_group.rg.location}"
   resource_group_name = "${azurerm_resource_group.rg.name}"
   dns_prefix          = "${var.name_prefix}"
-
+  api_server_authorized_ip_ranges = []
   linux_profile {
     admin_username = "ubuntu"
 
@@ -84,12 +84,4 @@ resource "azurerm_mysql_server" "mysql" {
   administrator_login_password = "${var.sql_password}"
   version                      = "5.7"
   ssl_enforcement              = "Enabled"
-}
-
-resource "azurerm_mysql_database" "db" {
-  name                = "lamp"
-  resource_group_name = "${azurerm_resource_group.rg.name}"
-  server_name         = "${azurerm_mysql_server.mysql.name}"
-  charset             = "utf8"
-  collation           = "utf8_unicode_ci"
 }

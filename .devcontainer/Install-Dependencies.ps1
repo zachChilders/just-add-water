@@ -7,7 +7,6 @@ Import-Module Requirements
 
 $azurecli = @(
     @{
-        Name     = "Install Azure CLI"
         Describe = "Install Azure CLI"
         Test     = { (which az).length -gt 0 }
         Set      = { curl -sL https://aka.ms/InstallAzureCLIDeb | bash } # TODO: Compare SHA256 to ensure this is correct
@@ -16,7 +15,6 @@ $azurecli = @(
 
 $terraform = @(
     @{
-        Name     = "Download Zip"
         Describe = "Download Terraform"
         Test     = { Test-Path -Path ./terraform.zip }
         Set      = {
@@ -26,7 +24,6 @@ $terraform = @(
         }
     },
     @{
-        Name     = "Unzip"
         Describe = "Install Terraform"
         Test     = { Test-Path -Path ./usr/local/bin/terraform }
         Set      = {
@@ -41,13 +38,12 @@ $terraform = @(
 
 $kubectl = @(
     @{
-        Name     = "Install Kubectl"
         Describe = "Install Kubectl"
         Test     = { Test-Path -Path ./usr/local/bin/kubectl }
         Set      = { az aks install-cli }
     }
 )
 
-$azurecli | Invoke-Requirement | Format-CallStack
-$terraform | Invoke-Requirement | Format-CallStack
-$kubectl | Invoke-Requirement | Format-CallStack
+$azurecli | Invoke-Requirement | Format-Verbose
+$terraform | Invoke-Requirement | Format-Verbose
+$kubectl | Invoke-Requirement | Format-Verbose
