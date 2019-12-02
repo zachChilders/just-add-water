@@ -36,7 +36,6 @@ function Expand-Template {
   Generates a list of container names for later usage.
 #>
 function Get-ContainerNames {
-  [CmdletBinding(SupportsShouldProcess = $true)]
   param(
     [string] $AppPath
   )
@@ -45,7 +44,6 @@ function Get-ContainerNames {
 
 
 function Get-KustomizePackages {
-  [CmdletBinding(SupportsShouldProcess = $true)]
   param(
     [string] $AppPath
   )
