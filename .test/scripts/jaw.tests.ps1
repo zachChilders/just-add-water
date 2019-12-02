@@ -20,7 +20,7 @@ Describe "Set-K8sConfig" {
         Get-Content "$OutRoot/k8s.json" -Raw | Should -Match "data"
     }
     It "Parses back to an Object" {
-        Get-Content "$OutRoot/k8s.json" -Raw | ConvertFrom-Json | Select "Name" | Should -Match "test.dockerfile"
+        Get-Content "$OutRoot/k8s.json" -Raw | ConvertFrom-Json | Select "Name" | Should -Match "data/kustomization-template.yaml"
     }
 }
 
