@@ -27,7 +27,7 @@ $acr_name = "sbdacrglobal.azurecr.io"
 $RunningInCI = ([boolean] $env:GITHUB_CLIENT_SECRET -and [boolean] $env:GITHUB_TENANT)
 
 # Auth Azure and gather subscription secrets
-$azureReqs = @(
+Push-Namespace "Dev Environment" {
     @{
         Describe = "Authenticate Azure Session"
         Test     = { [boolean] (az account show) }
@@ -44,7 +44,7 @@ $azureReqs = @(
                 az login
             }
         }
-    },
+    }
     @{
         Describe = "Inject Secrets into Session"
         Set      = {
@@ -63,15 +63,17 @@ $azureReqs = @(
             }
         }
     }
-)
+} `
+| Invoke-Requirement `
+| Format-Checklist
 
 # Provision Infra
-$tfReqs = @(
+Push-Namespace "Terraform" {
     @{
         Describe = "Enter Terraform Context"
         Test     = { (Get-Location).Path -eq "$RepoRoot/tf/enclave" }
         Set      = { Set-Location "$RepoRoot/tf/enclave" }
-    },
+    }
     @{
         Describe = "Initialize Terraform Environment"
         Test     = { Test-Path "$PSScriptRoot/tf/enclave/.terraform/terraform.tfstate" }
@@ -88,7 +90,7 @@ $tfReqs = @(
             # Ensure state is synchronized across deployments with production
             terraform refresh
         }
-    },
+    }
     @{
         Describe = "Plan terraform environment"
         Test     = { Test-Path "$OutputDir/$EnclaveName.plan" }
@@ -96,26 +98,28 @@ $tfReqs = @(
             New-Item -Path "$OutputDir" -ItemType Directory -Force
             terraform plan -out "$OutputDir/$EnclaveName.plan" -refresh=true
         }
-    },
+    }
     @{
         Describe = "Apply Terraform plan"
         Test     = { [boolean] (terraform output host) }
         Set      = { terraform apply "$OutputDir/$EnclaveName.plan" }
-    },
+    }
     @{
         Describe = "Generate k8s File"
         Test     = { Test-Path "$OutputDir/$EnclaveName" }
         Set      = { terraform output kube_config | Out-File "$OutputDir/$EnclaveName" }
-    },
+    }
     @{
         Describe = "Restore Location"
         Test     = { (Get-Location).Path -eq $RepoRoot }
         Set      = { Set-Location $RepoRoot }
     }
-)
+} `
+| Invoke-Requirement `
+| Format-Checklist
 
 # Docker cooking
-$dockerReqs = @(
+Push-Namespace "Docker" {
     @{
         Describe = "Generate Application Manifest"
         Set      = {
@@ -130,7 +134,7 @@ $dockerReqs = @(
             # Generate config JSON for remaining steps to read
             Set-k8sConfig -AppPath "./app" -OutPath $OutputDir
         }
-    },
+    }
     @{
         Describe = "Build all containers"
         Set      = {
@@ -138,7 +142,7 @@ $dockerReqs = @(
             $list = Get-Content $OutputDir/k8s.json | ConvertFrom-Json
             $list | % { docker build -t "$acr_name/$($_.ImageName)" -f $_.Name $_.Path }
         }
-    },
+    }
     @{
         Describe = "Push all containers"
         Set      = {
@@ -148,120 +152,125 @@ $dockerReqs = @(
             $list | % { docker push "$acr_name/$($_.ImageName)" }
         }
     }
-)
+} `
+| Invoke-Requirement `
+| Format-Checklist
 
-# Kubernetes Deployment
-$k8sReqs = @(
-    @{
-        Describe = "Load k8s config"
-        Set      = {
-            # Kubectl reads this variable to authenticate
-            $env:KUBECONFIG = "$OutputDir/$EnclaveName"
+# Application Deployment
+Push-Namespace "Application" {
+    Push-Namespace "Kubernetes Deployment" {
+        @{
+            Describe = "Load k8s config"
+            Set      = {
+                # Kubectl reads this variable to authenticate
+                $env:KUBECONFIG = "$OutputDir/$EnclaveName"
+            }
         }
-    },
-    @{
-        Describe = "Generate kustomization.yaml"
-        Set      = {
-            # Read manifest and templates
-            $list = Get-Content $OutputDir/k8s.json | ConvertFrom-Json
+        @{
+            Describe = "Generate kustomization.yaml"
+            Set      = {
+                # Read manifest and templates
+                $list = Get-Content $OutputDir/k8s.json | ConvertFrom-Json
 
-            # Populate templates from manifest info
-            $list | % {
-                $deploy_data = @{
-                    "sql_password" = $env:TF_VAR_sql_password
+                # Populate templates from manifest info
+                $list | % {
+                    $deploy_data = @{
+                        "sql_password" = $env:TF_VAR_sql_password
+                    }
+
+                    $deploy_template = (Get-Content $_.Name | Join-String -Separator "`n" )
+                    Expand-Template -Template $deploy_template -Data $deploy_data | Out-File "$($_.Path)/kustomization.yaml"
                 }
-
-                $deploy_template = (Get-Content $_.Name | Join-String -Separator "`n" )
-                Expand-Template -Template $deploy_template -Data $deploy_data | Out-File "$($_.Path)/kustomization.yaml"
             }
         }
-    },
-    @{
-        Describe = "Application deployment"
-        Set      = {
-            # Read manifest and templates
-            $list = Get-Content $OutputDir/k8s.json | ConvertFrom-Json
-            $list | % {
-                kubectl apply -k $_.Path
-            }
-        }
-    },
-    @{
-        Describe = "Configure Autoscale"
-        Test     = { kubectl get hpa }
-        Set      = {
-            # These values are pretty arbitrary and not measured at all.
-            (kubectl get deployment -o json | ConvertFrom-Json).items | % {
-                kubectl autoscale deployment $_.metadata.name --min=2 --max=5 --cpu-percent=80
-            }
-        }
-    },
-    @{
-        Describe = "Deploy kured"
-        Test     = { [boolean] (kubectl describe nodes | grep kured) }
-        Set      = {
-            # TODO: Cache kured fork
-            kubectl apply -f https://github.com/weaveworks/kured/releases/download/1.2.0/kured-1.2.0-dockerhub.yaml
-        }
-    },
-    @{
-        Describe = "Create DNS Name"
-        Test     = {
-            # By default, there's no domain label on the public ip resource
-            $rg = "MC_$($EnclaveName)_$($EnclaveName)_southcentralus"
-            $name = (az network public-ip list -g $rg | ConvertFrom-Json).name
-            (az network public-ip show -g $rg -n $name | ConvertFrom-Json).dnsSettings.domainNameLabel -eq "$EnclaveName"
-        }
-        Set      = {
-            # Set the domain label - it will be $EnclaveName.$Region.cloudapp.azure.com
-            $rg = "MC_$($EnclaveName)_$($EnclaveName)_southcentralus"
-            $name = (az network public-ip list -g $rg | ConvertFrom-Json).name
-            az network public-ip update -g $rg -n $name --dns-name "$EnclaveName"
-        }
-    },
-    @{
-        Describe = "Update Traffic Manager"
-        Test     = {
-            # Check for existence of our endpoint
-            $rg = "sbd-global"
-            (az network traffic-manager endpoint list -g $rg --profile-name "sbd-atm" | ConvertFrom-Json).name -eq $EnclaveName
-        }
-        Set      = {
-            # Add our endpoint with a weight of 1
-            $rg = "sbd-global"
-            $iprg = "MC_$($EnclaveName)_$($EnclaveName)_southcentralus"
-            $id = (az network public-ip list -g $iprg | ConvertFrom-Json).id
-            az network traffic-manager endpoint create -g $rg --profile-name "sbd-atm" -n $EnclaveName --type azureEndpoints --target-resource-id $id --endpoint-status enabled --weight 1
-        }
-    },
-    @{
-        Describe = "Generate Security Templates"
-        Test     = { Test-Path "$SecurityDir/firewall.yml" }
-        Set      = {
-            # Read block-egress template
-            $firewall_template = (Get-Content $TemplateDir/block-egress.yml | Join-String -Separator "`n")
-
-            # Populate block-egress template with service name
-            $firewall_data = @{
-                "service_name" = "wordpress"
-            }
-            Expand-Template -Template $firewall_template -Data $firewall_data | Out-File $SecurityDir/firewall.yml -Append
-        }
-    }
-    @{
-        Describe = "Security Policy Deployment"
-        # TODO: Set a test here to ensure proper application
-        Set      = {
-            # Apply all templates in the security path
-            Get-ChildItem $SecurityDir | % {
-                kubectl apply -f $_
+        @{
+            Describe = "Application deployment"
+            Set      = {
+                # Read manifest and templates
+                $list = Get-Content $OutputDir/k8s.json | ConvertFrom-Json
+                $list | % {
+                    kubectl apply -k $_.Path
+                }
             }
         }
     }
-)
+    Push-Namespace "Resiliency" {
+        @{
+            Describe = "Configure Autoscale"
+            Test     = { kubectl get hpa }
+            Set      = {
+                # These values are pretty arbitrary and not measured at all.
+                (kubectl get deployment -o json | ConvertFrom-Json).items | % {
+                    kubectl autoscale deployment $_.metadata.name --min=2 --max=5 --cpu-percent=80
+                }
+            }
+        }
+        @{
+            Describe = "Deploy kured"
+            Test     = { [boolean] (kubectl describe nodes | grep kured) }
+            Set      = {
+                # TODO: Cache kured fork
+                kubectl apply -f https://github.com/weaveworks/kured/releases/download/1.2.0/kured-1.2.0-dockerhub.yaml
+            }
+        }
+        @{
+            Describe = "Create DNS Name"
+            Test     = {
+                # By default, there's no domain label on the public ip resource
+                $rg = "MC_$($EnclaveName)_$($EnclaveName)_southcentralus"
+                $name = (az network public-ip list -g $rg | ConvertFrom-Json).name
+                (az network public-ip show -g $rg -n $name | ConvertFrom-Json).dnsSettings.domainNameLabel -eq "$EnclaveName"
+            }
+            Set      = {
+                # Set the domain label - it will be $EnclaveName.$Region.cloudapp.azure.com
+                $rg = "MC_$($EnclaveName)_$($EnclaveName)_southcentralus"
+                $name = (az network public-ip list -g $rg | ConvertFrom-Json).name
+                az network public-ip update -g $rg -n $name --dns-name "$EnclaveName"
+            }
+        }
+        @{
+            Describe = "Update Traffic Manager"
+            Test     = {
+                # Check for existence of our endpoint
+                $rg = "sbd-global"
+                (az network traffic-manager endpoint list -g $rg --profile-name "sbd-atm" | ConvertFrom-Json).name -eq $EnclaveName
+            }
+            Set      = {
+                # Add our endpoint with a weight of 1
+                $rg = "sbd-global"
+                $iprg = "MC_$($EnclaveName)_$($EnclaveName)_southcentralus"
+                $id = (az network public-ip list -g $iprg | ConvertFrom-Json).id
+                az network traffic-manager endpoint create -g $rg --profile-name "sbd-atm" -n $EnclaveName --type azureEndpoints --target-resource-id $id --endpoint-status enabled --weight 1
+            }
+        }
+    }
+    Push-Namespace "Hardening" {
+        @{
+            Describe = "Generate Security Templates"
+            Test     = { Test-Path "$SecurityDir/firewall.yml" }
+            Set      = {
+                # Read block-egress template
+                $firewall_template = (Get-Content $TemplateDir/block-egress.yml | Join-String -Separator "`n")
 
-# Apply all Requirements
-$azureReqs | Invoke-Requirement | Format-Checklist
-$tfReqs | Invoke-Requirement | Format-Checklist
-$dockerReqs | Invoke-Requirement | Format-Checklist
-$k8sReqs | Invoke-Requirement | Format-Checklist
+                # Populate block-egress template with service name
+                $firewall_data = @{
+                    "service_name" = "wordpress"
+                }
+                Expand-Template -Template $firewall_template -Data $firewall_data | Out-File $SecurityDir/firewall.yml -Append
+            }
+        }
+        @{
+            Describe = "Security Policy Deployment"
+            # TODO: Set a test here to ensure proper application
+            Set      = {
+                # Apply all templates in the security path
+                Get-ChildItem $SecurityDir | % {
+                    kubectl apply -f $_
+                }
+            }
+        }
+    }
+} `
+| Invoke-Requirement `
+| Format-Checklist
+
