@@ -1,0 +1,16 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ingress-{{image_name}}
+  annotations:
+    # use the shared ingress-nginx
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  rules:
+  - host: {{host_name}}
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: {{image_name}}
+          servicePort: 80

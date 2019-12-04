@@ -12,12 +12,12 @@ Import-Module -Name "./modules/jaw"
 }
 
 # Auth Azure and gather subscription secrets
-$azureReqs = @(
+Push-Namespace "Active Directory" {
     @{
         Describe = "Authenticate Azure Session"
         Test     = { [boolean] (az account show) }
         Set      = { az login }
-    },
+    }
     @{
         Name     = "Export Tenant Info"
         Describe = "Exporting Tenant Information"
@@ -25,7 +25,7 @@ $azureReqs = @(
             $az = az account show | ConvertFrom-Json
             $env:TF_VAR_tenantId = $az.tenantId
         }
-    },
+    }
     @{
         Describe = "Create Service Principal"
         Test     = {
@@ -37,7 +37,7 @@ $azureReqs = @(
             $env:TF_VAR_client_id = $sp.appId
             $env:TF_VAR_client_secret = $sp.password
         }
-    },
+    }
     @{
         Describe = "Create User Group"
         Test     = {
@@ -48,7 +48,7 @@ $azureReqs = @(
             $azg = (az ad group create --display-name sbdadmin --mail-nickname admins) | ConvertFrom-Json
             $env:TF_VAR_groupId = $azg.objectId
         }
-    },
+    }
     @{
         Describe = "Add Self to Group"
         Test     = {
@@ -61,15 +61,15 @@ $azureReqs = @(
             az ad group member add --group sbdadmin --member $memberId
         }
     }
-)
+} | Invoke-Requirement | Format-Checklist
 
 # Detect global infra
-$globalReqs = @(
+Push-Namespace "Central Infrastructure" {
     @{
         Describe = "Enter Terraform Context"
         Test     = { (Get-Location).Path -eq "$RepoRoot/tf/global" }
         Set      = { Set-Location "$RepoRoot/tf/global" }
-    },
+    }
     @{
         Describe = "Initialize Terraform Environment"
         Test     = { Test-Path "$PSScriptRoot/tf/global/.terraform" }
@@ -77,7 +77,7 @@ $globalReqs = @(
             terraform init
             terraform refresh
         }
-    },
+    }
     @{
         Describe = "Plan Terraform Environment"
         Test     = { Test-Path "$OutputDir/global.plan" }
@@ -85,11 +85,11 @@ $globalReqs = @(
             New-Item -Path "$OutputDir" -ItemType Directory -Force
             terraform plan -out "$OutputDir/global.plan"
         }
-    },
+    }
     @{
         Describe = "Apply Terraform plan"
         Set      = { terraform apply "$OutputDir/global.plan" }
-    },
+    }
     @{
         Describe = "Generate Global Config File"
         Test     = { Test-Path "$OutputDir/global" }
@@ -98,15 +98,15 @@ $globalReqs = @(
             terraform output | Out-File "$OutputDir/global"
             $env:kv_name = (terraform output kv-name)
         }
-    },
+    }
     @{
         Describe = "Restore Location"
         Test     = { (Get-Location).Path -eq $RepoRoot }
         Set      = { Set-Location $RepoRoot }
     }
-)
+} | Invoke-Requirement | Format-Checklist
 
-$persistReqs = @(
+Push-Namespace "Persistence" {
     @{
         Name     = "Load Config"
         Describe = "Load State Config"
@@ -136,11 +136,7 @@ $persistReqs = @(
             az storage blob upload --container-name tfstate --name terraform.tfstate --file $RepoRoot/tf/global/terraform.tfstate | Out-Null
         }
     }
-)
-
-$azureReqs | Invoke-Requirement | Format-Checklist
-$globalReqs | Invoke-Requirement | Format-Checklist
-$persistReqs | Invoke-Requirement | Format-Checklist
+} | Invoke-Requirement | Format-Checklist
 
 # Set terraform secrets
 Get-Content $OutputDir/global `
@@ -173,12 +169,6 @@ Get-Content $OutputDir/global `
 
 # Set SQL secrets
 @(
-    @{
-        Describe = "Randomized Secret 'TF-VAR-sql-user' exists"
-        Set      = {
-            az keyvault secret set --name "TF-VAR-sql-user" --vault-name $env:kv_name --value "sbdadmin"
-        }
-    },
     @{
         Describe = "Randomized Secret 'TF-VAR-sql-password' exists"
         Set      = {

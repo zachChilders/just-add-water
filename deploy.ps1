@@ -194,6 +194,30 @@ Push-Namespace "Application" {
             }
         }
     }
+    Push-Namespace "Reverse Proxy" {
+        @{
+            Describe = "Deploy Nginx"
+            Set      = {
+                kubectl apply -f $TemplateDir/nginx-mandatory.yaml
+                kubectl apply -f $TemplateDir/nginx-azure.yaml
+            }
+        }
+        @{
+            Describe = "Configure Nginx"
+            Set      = {
+                $k8s_config = Get-Content $OutputDir/k8s.json | ConvertFrom-Json
+
+                $nginx_config = @{
+                    "image_name" = $k8s_config.ImageName
+                    "host_name"  = "$env:TF_VAR_name_prefix.southcentralus.cloudapp.azure.com"
+                }
+
+                $nginx_template = (Get-Content $TemplateDir/nginx.yaml | Join-String -Separator "`n" )
+                Expand-Template -Template $nginx_template -Data $nginx_config | Out-File $OutputDir/nginx.yaml
+                kubectl apply -f $OutputDir/nginx.yaml
+            }
+        }
+    }
     Push-Namespace "Resiliency" {
         @{
             Describe = "Configure Autoscale"
@@ -210,7 +234,7 @@ Push-Namespace "Application" {
             Test     = { [boolean] (kubectl describe nodes | grep kured) }
             Set      = {
                 # TODO: Cache kured fork
-                kubectl apply -f https://github.com/weaveworks/kured/releases/download/1.2.0/kured-1.2.0-dockerhub.yaml
+                kubectl apply -f $TemplateDir/kured.yaml
             }
         }
         @{
