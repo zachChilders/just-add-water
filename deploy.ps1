@@ -209,7 +209,7 @@ Push-Namespace "Application" {
 
                 $nginx_config = @{
                     "image_name"   = $k8s_config.ImageName
-                    "cluster_name" = $env:TF_VAR_name_prefix
+                    "host_name" = "$env:TF_VAR_name_prefix.southcentralus.cloudapp.azure.com"
                 }
 
                 $nginx_template = (Get-Content $TemplateDir/nginx.yaml | Join-String -Separator "`n" )
