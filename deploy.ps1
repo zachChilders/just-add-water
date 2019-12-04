@@ -207,7 +207,10 @@ Push-Namespace "Application" {
             Set      = {
                 $k8s_config = Get-Content $OutputDir/k8s.json | ConvertFrom-Json
 
-                $nginx_config = @{"image_name" = $k8s_config.ImageName }
+                $nginx_config = @{
+                    "image_name" = $k8s_config.ImageName
+                    "cluster_name" = $env:TF_VAR_name_prefix
+                }
 
                 $nginx_template = (Get-Content $TemplateDir/nginx.yaml | Join-String -Separator "`n" )
                 Expand-Template -Template $nginx_template -Data $nginx_config | Out-File $OutputDir/nginx.yaml
