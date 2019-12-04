@@ -208,8 +208,8 @@ Push-Namespace "Application" {
                 $k8s_config = Get-Content $OutputDir/k8s.json | ConvertFrom-Json
 
                 $nginx_config = @{
-                    "image_name"   = $k8s_config.ImageName
-                    "host_name" = "$env:TF_VAR_name_prefix.southcentralus.cloudapp.azure.com"
+                    "image_name" = $k8s_config.ImageName
+                    "host_name"  = "$env:TF_VAR_name_prefix.southcentralus.cloudapp.azure.com"
                 }
 
                 $nginx_template = (Get-Content $TemplateDir/nginx.yaml | Join-String -Separator "`n" )
