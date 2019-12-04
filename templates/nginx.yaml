@@ -10,7 +10,7 @@ spec:
   - host: {{cluster_name}}.southcentralus.cloudapp.azure.com
     http:
       paths:
-      - path: /
+      - path: /*
         backend:
           serviceName: {{image_name}}
           servicePort: 80

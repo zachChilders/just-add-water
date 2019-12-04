@@ -198,8 +198,8 @@ Push-Namespace "Application" {
         @{
             Describe = "Deploy Nginx"
             Set      = {
-                kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/mandatory.yaml
-                kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/cloud-generic.yaml
+                kubectl apply -f $TemplateDir/nginx-mandatory.yaml
+                kubectl apply -f $TemplateDir/nginx-azure.yaml
             }
         }
         @{
@@ -208,7 +208,7 @@ Push-Namespace "Application" {
                 $k8s_config = Get-Content $OutputDir/k8s.json | ConvertFrom-Json
 
                 $nginx_config = @{
-                    "image_name" = $k8s_config.ImageName
+                    "image_name"   = $k8s_config.ImageName
                     "cluster_name" = $env:TF_VAR_name_prefix
                 }
 
@@ -234,7 +234,7 @@ Push-Namespace "Application" {
             Test     = { [boolean] (kubectl describe nodes | grep kured) }
             Set      = {
                 # TODO: Cache kured fork
-                kubectl apply -f https://github.com/weaveworks/kured/releases/download/1.2.0/kured-1.2.0-dockerhub.yaml
+                kubectl apply -f $TemplateDir/kured.yaml
             }
         }
         @{
