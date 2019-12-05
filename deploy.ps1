@@ -1,5 +1,6 @@
 param(
-    [string]$EnclaveName = "sbd"
+    [string]$EnclaveName = "sbd",
+    [string]$HostName = "wp.mics-sbd.dev"
 )
 
 $ErrorActionPreference = "Stop"
@@ -196,6 +197,17 @@ Push-Namespace "Application" {
     }
     Push-Namespace "Reverse Proxy" {
         @{
+            Describe = "Upload TLS Cert"
+            Set = {
+                $tls_key = (az keyvault secret show --vault-name $kv_name --name tls-key | ConvertFrom-Json).value
+                $tls_cert = (az keyvault secret show --vault-name $kv_name --name tls-cert | ConvertFrom-Json).value
+                $tls_key | Out-File $OutputDir/tls-key.pem
+                $tls_cert | Out-File $OutputDir/tls-cert.pem
+                kubectl create secret tls $HostName --key "$OutputDir/tls-key.pem" --cert "$OutputDir/tls-cert.pem"
+                "$OutputDir/tls-key.pem", "$OutputDir/tls-cert.pem" | % { Remove-Item $_ }
+            }
+        }
+        @{
             Describe = "Deploy Nginx"
             Set      = {
                 kubectl apply -f $TemplateDir/nginx-mandatory.yaml
@@ -209,7 +221,7 @@ Push-Namespace "Application" {
 
                 $nginx_config = @{
                     "image_name" = $k8s_config.ImageName
-                    "host_name"  = "$env:TF_VAR_name_prefix.southcentralus.cloudapp.azure.com"
+                    "host_name"  = $HostName
                 }
 
                 $nginx_template = (Get-Content $TemplateDir/nginx.yaml | Join-String -Separator "`n" )
